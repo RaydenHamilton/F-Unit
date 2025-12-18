@@ -1,13 +1,20 @@
+--!nocheck
 local LogicModule = {}
 
-local tempData = require(script.Parent.TempData)
-local miscFunctions = require(script.Parent.MiscFunctions)
-local createInstances = require(script.Parent.CreateInstances)
-local createEffects = require(script.Parent.CreateEffects)
+--// Services
+local Players = game:GetService("Players")
 
-local player = game.Players.LocalPlayer
+--// Variables
+local player = Players.LocalPlayer
+local client = player.PlayerScripts.Client
 local mouse = player:GetMouse()
+--// Modules
+local tempData = require(client.TempData)
+local miscFunctions = require(client.MiscFunctions)
+local createEffects = require(client.CreateEffects)
+-- local createInstances = require(script.Parent.CreateInstances)
 
+--// Module Functions
 LogicModule.canWalkTo = function(input)
 	if
 		input.UserInputType == Enum.UserInputType.MouseMovement

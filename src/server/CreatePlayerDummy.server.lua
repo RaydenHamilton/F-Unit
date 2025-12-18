@@ -1,3 +1,7 @@
+--!nocheck
+--// Services
+local Players = game:GetService("Players")
+
 --// Local Functions
 local function playAimation(character)
 	local humanoid = character:WaitForChild("Humanoid")
@@ -14,7 +18,7 @@ end
 local function PlayerTeam(player)
 	if player.Team.Name == "TeamOne" then
 		local char = game:WaitForChild("Players"):CreateHumanoidModelFromUserId(player.UserId)
-		for i, part in pairs(char:GetChildren()) do
+		for _, part in pairs(char:GetChildren()) do
 			if not part:IsA("BasePart") and part.Name ~= char.Humanoid.Name then
 				local leader = workspace.Map.bunkerOne.leader
 				part.Parent = leader
@@ -24,7 +28,7 @@ local function PlayerTeam(player)
 		end
 	elseif player.Team.Name == "TeamTwo" then
 		local char = game:WaitForChild("Players"):CreateHumanoidModelFromUserId(player.UserId)
-		for i, part in pairs(char:GetChildren()) do
+		for _, part in pairs(char:GetChildren()) do
 			if not part:IsA("BasePart") and part.Name ~= char.Humanoid.Name then
 				local leader = workspace.Map.bunkerTwo.leader
 				part.Parent = leader
@@ -36,4 +40,4 @@ local function PlayerTeam(player)
 end
 
 --//Events
-game.Players.PlayerAdded:Connect(PlayerTeam)
+Players.PlayerAdded:Connect(PlayerTeam)

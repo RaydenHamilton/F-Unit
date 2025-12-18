@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 
 if not game:IsLoaded() then
 	game.Loaded:Wait()
@@ -7,6 +7,7 @@ end
 --// Services
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
 
 --// Variables
 local cam = workspace.CurrentCamera
@@ -16,10 +17,10 @@ local rotating = false
 local speed = 5
 local sens = 0.3
 local validKeys = { "Enum.KeyCode.W", "Enum.KeyCode.A", "Enum.KeyCode.S", "Enum.KeyCode.D" }
-local touchPos: any
+local touchPos
 
 cam.CameraType = Enum.CameraType.Scriptable
-cam.CFrame = game.Workspace.Map.field.CFrame + Vector3.new(0, 50, 0)
+cam.CFrame = Workspace.Map.field.CFrame + Vector3.new(0, 50, 0)
 
 if onMobile then
 	sens *= 2
@@ -64,7 +65,7 @@ end
 RunService.RenderStepped:Connect(renderStepped)
 
 UserInputService.InputBegan:Connect(function(Input)
-	for i, key in pairs(validKeys) do
+	for _, key in pairs(validKeys) do
 		if key == tostring(Input.KeyCode) then
 			keysDown[key] = true
 		end
@@ -90,7 +91,7 @@ UserInputService.InputBegan:Connect(function(Input)
 end)
 
 UserInputService.InputEnded:Connect(function(Input)
-	for key, v in pairs(keysDown) do
+	for key in pairs(keysDown) do
 		if key == tostring(Input.KeyCode) then
 			keysDown[key] = false
 		end

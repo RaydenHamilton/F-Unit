@@ -1,10 +1,21 @@
-local MiscFunctions = {}
-local remoteFunc = game.ReplicatedStorage.NPCEvents.GetNPCData
-local tempData = require(script.Parent.TempData)
+--!nocheck
 
-local player = game.Players.LocalPlayer
+local MiscFunctions = {}
+
+--// Services
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+
+--// Variables
+local player = Players.LocalPlayer
+local Client = player.PlayerScripts.Client
 local botGui = player:WaitForChild("PlayerGui"):WaitForChild("Main")
 local mouse = player:GetMouse()
+local remoteFunc = ReplicatedStorage.NPCEvents.GetNPCData
+
+--// Modules
+local tempData = require(Client.TempData)
 
 --// Module Functions
 MiscFunctions.restStep = function(max)
@@ -38,6 +49,28 @@ MiscFunctions.incrementStep = function()
 	tempData.whatStepIsItOn += 1
 end
 
+MiscFunctions.removeObject = function(object)
+	if object then
+		object:Destroy()
+	end
+	return nil
+end
+
+MiscFunctions.removeObjects = function()
+	tempData.characterHighlight = MiscFunctions.removeObject(tempData.characterHighlight)
+	tempData.marker = MiscFunctions.removeObject(tempData.marker)
+	tempData.hologram = MiscFunctions.removeObject(tempData.hologram)
+end
+
+MiscFunctions.isMyNPC = function(soldier: Model)
+	if soldier then
+		local owner = remoteFunc:InvokeServer(soldier, "owner")
+		return owner == player.UserId
+	else
+		return false
+	end
+end
+
 MiscFunctions.unselect = function()
 	if MiscFunctions.isMyNPC(tempData.Target) and tempData.Target then
 		if tempData.Target:FindFirstChild("Underlay") then
@@ -53,16 +86,10 @@ MiscFunctions.unselect = function()
 	MiscFunctions.removeObjects()
 end
 
-MiscFunctions.removeObjects = function()
-	tempData.characterHighlight = MiscFunctions.removeObject(tempData.characterHighlight)
-	tempData.marker = MiscFunctions.removeObject(tempData.marker)
-	tempData.hologram = MiscFunctions.removeObject(tempData.hologram)
-end
-
 MiscFunctions.raycast = function(length, center)
 	local raycastParams = RaycastParams.new()
 
-	raycastParams.FilterDescendantsInstances = { game.Workspace.ClientParts, game.Workspace.Targets }
+	raycastParams.FilterDescendantsInstances = { Workspace.ClientParts, Workspace.Targets }
 	raycastParams.FilterType = Enum.RaycastFilterType.Exclude
 
 	local direction = (length - center).Unit * (length - center).Magnitude * 0.99
@@ -103,24 +130,8 @@ MiscFunctions.MouseIsInregion = function()
 	end
 end
 
-MiscFunctions.isMyNPC = function(soldier: Model)
-	if soldier and soldier then
-		local owner = remoteFunc:InvokeServer(soldier, "owner")
-		return owner == player.UserId
-	else
-		return false
-	end
-end
-
 MiscFunctions.ifNot = function()
 	return not tempData.HealingTeamate and not tempData.placeingWall
-end
-
-MiscFunctions.removeObject = function(object)
-	if object then
-		object:Destroy()
-	end
-	return nil
 end
 
 return MiscFunctions

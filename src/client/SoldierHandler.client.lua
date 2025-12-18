@@ -1,34 +1,35 @@
---!strict
-
---// Modules
-local createInstances = require(script.CreateInstances)
-local createEffects = require(script.CreateEffects)
-local tempData = require(script.TempData)
-local miscFunctions = require(script.MiscFunctions)
-local eventModule = require(script.EventModule)
-local logicModule = require(script.LogicModule)
+--!nocheck
 
 --// Services
 local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local WorkSpace = game:GetService("Workspace")
+local Players = game:GetService("Players")
+
+--// Modules
+local Modules = Players.LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("Client")
+-- local createInstances = require(script.CreateInstances)
+local createEffects = require(Modules:WaitForChild("CreateEffects"))
+local tempData = require(Modules.TempData)
+local miscFunctions = require(Modules.MiscFunctions)
+local eventModule = require(Modules.EventModule)
+local logicModule = require(Modules.LogicModule)
 
 --// Varubles
-local NPCEvents = game.ReplicatedStorage.NPCEvents
 local player = Players.LocalPlayer
 local botGui = player:WaitForChild("PlayerGui"):WaitForChild("Main")
 local actions = botGui.Actions
 local position = botGui.Position
 local mouse = player:GetMouse()
-local remoteFunc = game.ReplicatedStorage.NPCEvents.GetNPCData
+local remoteFunc = ReplicatedStorage.NPCEvents.GetNPCData
 
 --// Gui
-local wallButton: GuiButton = botGui["Build"].Background.ImageButton
-local selfHeal: GuiButton = actions.HealSelf.ImageButton
-local healOther: GuiButton = actions.HealOther.ImageButton
-local crouch: GuiButton = position.Crouch.ImageButton
-local crawl: GuiButton = position.Crawl.ImageButton
-local stand: GuiButton = position.Stand.ImageButton
+local wallButton = botGui["Build"].Background.ImageButton
+local selfHeal = actions.HealSelf.ImageButton
+local healOther = actions.HealOther.ImageButton
+local crouch = position.Crouch.ImageButton
+local crawl = position.Crawl.ImageButton
+local stand = position.Stand.ImageButton
 
 --// Local Functions
 local function changeSoldier()
@@ -83,12 +84,12 @@ local function onLelfClick()
 		and tempData.characterHighlight
 		and tempData.characterHighlight.Parent
 	then
-		local spawnModel: Model = mouse.Target.Parent.Parent
+		local spawnModel = mouse.Target.Parent.Parent
 		local Params = OverlapParams.new()
 		Params.FilterType = Enum.RaycastFilterType.Whitelist
 		Params.FilterDescendantsInstances = { WorkSpace.Targets }
 		local getTouchingParts =
-			WorkSpace:GetPartBoundsInBox((spawnModel.PrimaryPart :: BasePart).CFrame, Vector3.new(20, 20, 20), Params)
+			WorkSpace:GetPartBoundsInBox(spawnModel.PrimaryPart.CFrame, Vector3.new(20, 20, 20), Params)
 		if #getTouchingParts == 0 then
 			tempData.characterHighlight.OutlineColor = Color3.new(1, 1, 1)
 			player.PlayerGui.ShopUI.Enabled = true

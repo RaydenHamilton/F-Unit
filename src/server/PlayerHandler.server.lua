@@ -1,13 +1,13 @@
---!strict
-
---// Modules
-local playerData = require(game.ServerStorage.PlayerData)
-local soldierClasses = require(game.ReplicatedStorage.Classes)
-local CreateSoldierModule = require(game.ServerStorage.soldierModule)
-
 --// Services
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+local ServerStorage = game:GetService("ServerStorage")
+
+--// Modules
+local playerData = require(ServerStorage:WaitForChild("PlayerData"))
+local soldierClasses = require(ReplicatedStorage.Shared.Classes)
+local CreateSoldierModule = require(ServerStorage.soldierModule)
 
 --// Varubles
 local PlayerInstances = {}
@@ -15,7 +15,7 @@ local PlayerInstances = {}
 function onPlayerAdded(player: Player) -- change to on round start
 	PlayerInstances[player.UserId] = playerData.New(player)
 	ReplicatedStorage.NPCEvents.TellClientMoney:FireClient(player, PlayerInstances[player.UserId].Points)
-	while task.wait(1) and game.Players:FindFirstChild(player.Name) do
+	while task.wait(1) and Players:FindFirstChild(player.Name) do
 		PlayerInstances[player.UserId]:AddPoints()
 		ReplicatedStorage.NPCEvents.TellClientMoney:FireClient(player, PlayerInstances[player.UserId].Points)
 	end
@@ -35,7 +35,7 @@ function buySoldier(player: Player, soldierType, spawn: Model)
 
 		local class = require(ReplicatedStorage.Classes)[soldierType[i]]
 		local soldier: Model = ReplicatedStorage.SoldierCopys[soldierType[i]]:Clone()
-		soldier.Parent = game.Workspace.Targets;
+		soldier.Parent = Workspace.Targets;
 
 		(soldier.PrimaryPart :: BasePart).CFrame = CFrame.new((rootPart.Position + Vector3.new(0, 5, 0)))
 			* CFrame.new(direction * 10)
@@ -52,4 +52,4 @@ end
 --// Events
 Players.PlayerRemoving:Connect(onPlayerRemoved)
 Players.PlayerAdded:Connect(onPlayerAdded)
-game.ReplicatedStorage.NPCEvents.Heal.OnServerEvent:Connect(buySoldier)
+ReplicatedStorage.NPCEvents.Heal.OnServerEvent:Connect(buySoldier)

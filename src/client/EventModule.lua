@@ -1,21 +1,22 @@
---!strict
+--!nocheck
 
 local EventModule = {}
 
---// Modules
-local tempData = require(script.Parent.TempData)
-local MiscFunctions = require(script.Parent.MiscFunctions)
-local createInstances = require(script.Parent.CreateInstances)
-local createEffects = require(script.Parent.CreateEffects)
-
 --// Services
-local Player = game:GetService("Players")
+local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+--// Variables
 local sandbag = ReplicatedStorage.ReplicatedObjects.Sandbag
-
-local player = Player.LocalPlayer
+local player = Players.LocalPlayer
 local NPCEvents = ReplicatedStorage.NPCEvents
+local Client = player.PlayerScripts.Client
+
+--// Modules
+local tempData = require(Client.TempData)
+local MiscFunctions = require(Client.MiscFunctions)
+local createInstances = require(Client.CreateInstances)
+local createEffects = require(Client.CreateEffects)
 
 -- Events
 local placeObject = NPCEvents.PlaceObject
@@ -28,7 +29,7 @@ local botGui = player:WaitForChild("PlayerGui"):WaitForChild("Main")
 
 --// Module Functions
 EventModule.crawl = function()
-	setPose:FireServer("cwral", tempData.Target)
+	setPose:FireServer("crawl", tempData.Target)
 end
 
 EventModule.crouch = function()
@@ -40,7 +41,7 @@ EventModule.stand = function()
 end
 
 EventModule.placeWall = function()
-	local remoteFunc = game.ReplicatedStorage.NPCEvents.GetNPCData
+	local remoteFunc = ReplicatedStorage.NPCEvents.GetNPCData
 	tempData.placeingWall = true
 	local Walls = remoteFunc:InvokeServer(tempData.Target, "Walls")
 	if not tempData.marker then
@@ -69,7 +70,8 @@ EventModule.placeWall = function()
 					tempData.Target
 				)
 			end
-			return MiscFunctions.unselect()
+			MiscFunctions.unselect()
+			return
 		end
 		local text = createInstances.makeBillboardGui(tempData.marker)
 		tempData.partStart = mouse.Hit.Position + Vector3.new(0, tempData.marker.Size.Y / 2, 0)
@@ -120,7 +122,7 @@ EventModule.OpenBunker = function()
 	return false
 end
 
-EventModule.clickNewEnemy = function(input)
+EventModule.clickNewEnemy = function()
 	if tempData.characterHighlight and tempData.characterHighlight.Parent.Parent.Name == "Targets" then
 		NPCEvents.NewTarget:FireServer(tempData.characterHighlight.Parent, tempData.Target)
 		MiscFunctions.removeObjects()

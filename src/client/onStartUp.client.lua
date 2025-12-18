@@ -1,6 +1,11 @@
-local targets = game.Workspace.Targets
-local player = game.Players.LocalPlayer.UserId
-local remoteFunc = game.ReplicatedStorage.NPCEvents.GetNPCData
+--!nocheck
+--// Services
+local Players = game:GetService("Players")
+local Workspace = game:GetService("Workspace")
+
+--// Variables
+local targets = Workspace.Targets
+local player = Players.LocalPlayer.UserId
 
 function CharterAdded(soldier: Model)
 	local owner = soldier:GetAttribute("Owner")
@@ -21,7 +26,7 @@ function CharterAdded(soldier: Model)
 	local setUnderlay
 	setUnderlay = game:GetService("RunService").RenderStepped:Connect(function()
 		if soldier:FindFirstChild("Head") then
-			local pass, error = pcall(function()
+			local pass = pcall(function()
 				local raycastResult =
 					workspace:Raycast(soldier.PrimaryPart.Position, Vector3.new(0, -9999999, 0), ShotRules)
 				if raycastResult then
@@ -44,12 +49,12 @@ function CharterAdded(soldier: Model)
 	end)
 end
 
-for i, character in pairs(targets:GetChildren()) do
+for _, character in pairs(targets:GetChildren()) do
 	CharterAdded(character)
 end
 
 targets.ChildAdded:Connect(CharterAdded)
 
-for i, v in pairs(game.StarterGui:GetChildren()) do
+for _, v in pairs(game.StarterGui:GetChildren()) do
 	v.Parent = game.Players.LocalPlayer.PlayerGui
 end

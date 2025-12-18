@@ -8,13 +8,12 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local player = Players.LocalPlayer
 local buttons = player.PlayerGui:WaitForChild("ShopUI").Frame
 local buySoldierEvent = ReplicatedStorage.NPCEvents.BuySoldier
-local mouse = player:GetMouse()
 local GetPlayerMoney = 100
 local points = player.PlayerGui.HudUI.Points.MPNumber
 local data = ReplicatedStorage.Remotes.RemoteFunctions.GetDataStore:InvokeServer()
 
 --// Modules
-local classes = require(game.ReplicatedStorage.Classes)
+local classes = require(ReplicatedStorage.Shared.Classes)
 local tempData = require(script.Parent.SoldierHandler.TempData)
 local MiscFunctions = require(script.Parent.SoldierHandler.MiscFunctions)
 
@@ -33,7 +32,7 @@ local function Buy(button)
 			GetPlayerMoney -= classes[squad[i]].Cost
 			points.Text = GetPlayerMoney
 		end
-		game.Players.LocalPlayer.PlayerGui.ShopUI.Enabled = false
+		Players.LocalPlayer.PlayerGui.ShopUI.Enabled = false
 		tempData.characterHighlight = MiscFunctions.removeObject(tempData.characterHighlight)
 	end
 end
@@ -44,9 +43,9 @@ local function UpdateMoney(money)
 end
 
 --// Events
-game.ReplicatedStorage.NPCEvents.TellClientMoney.OnClientEvent:Connect(UpdateMoney)
+ReplicatedStorage.NPCEvents.TellClientMoney.OnClientEvent:Connect(UpdateMoney)
 
-for i, v in buttons:GetChildren() do
+for _, v in buttons:GetChildren() do
 	if v:IsA("GuiButton") then
 		v.MouseButton1Up:Connect(function()
 			Buy(v)

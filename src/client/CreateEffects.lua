@@ -1,33 +1,34 @@
---!strict
-
+--!nocheck
 local CreateEffects = {}
-
-local remoteFunc = game.ReplicatedStorage.NPCEvents.GetNPCData
-
---// Modules
-local tempData = require(script.Parent.TempData)
-local MiscFunctions = require(script.Parent.MiscFunctions)
-local createInstances = require(script.Parent.CreateInstances)
 
 --// Services
 local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Players = game:GetService("Players")
+local remoteFunc = ReplicatedStorage.NPCEvents.GetNPCData
+local Workspace = game:GetService("Workspace")
 
---// Varubles
-local player = game.Players.LocalPlayer
+--// Variables
+local player = Players.LocalPlayer
 local mouse = player:GetMouse()
+local playerScripts = player.PlayerScripts
+--// Modules
+local tempData = require(playerScripts.TempData)
+local MiscFunctions = require(playerScripts.MiscFunctions)
+local createInstances = require(playerScripts.CreateInstances)
 
 --// Module Functions
-CreateEffects.ShowRange = function(Target: Model, soldierRange: number)
-	local rootPart = Target.PrimaryPart :: BasePart
+CreateEffects.ShowRange = function(Target, soldierRange)
+	local rootPart = Target.PrimaryPart
 	local numRays = 200 -- Number of rays in the circle
 	local last
 	for i = 0, numRays do
 		local ShotRules = RaycastParams.new()
 		ShotRules.FilterDescendantsInstances = {
 			Target,
-			game.Workspace.Targets,
-			game.Workspace.ClientParts,
-			game.Workspace.walls,
+			Workspace.Targets,
+			Workspace.ClientParts,
+			Workspace.walls,
 		}
 		ShotRules.FilterType = Enum.RaycastFilterType.Exclude
 		ShotRules.IgnoreWater = true
@@ -36,7 +37,8 @@ CreateEffects.ShowRange = function(Target: Model, soldierRange: number)
 		local localDirection = Vector3.new(math.cos(angle), 0, math.sin(angle)) -- Direction in rootPart's local space
 		local direction = rootPart.CFrame:VectorToWorldSpace(localDirection) -- Convert to world space relative to rootPart
 		local raycastResult = workspace:Raycast(rootPart.Position, direction * 200, ShotRules) -- Cast the ray
-		local attachment = Instance.new("Attachment", rootPart)
+		local attachment = Instance.new("Attachment")
+		attachment.Parent = rootPart
 
 		attachment.Visible = false
 
@@ -51,7 +53,8 @@ CreateEffects.ShowRange = function(Target: Model, soldierRange: number)
 		end)
 
 		if last then
-			local beam = Instance.new("Beam", attachment)
+			local beam = Instance.new("Beam")
+			beam.Parent = attachment
 			beam.Attachment0 = attachment
 			beam.Attachment1 = last
 		end
@@ -60,16 +63,16 @@ CreateEffects.ShowRange = function(Target: Model, soldierRange: number)
 	end
 end
 
-CreateEffects.makeHologram = function(start: Vector3)
+CreateEffects.makeHologram = function(start)
 	MiscFunctions.restStep(25)
-	for count = 0, tempData.maxSteps, 1 do
+	for _ = 0, tempData.maxSteps, 1 do
 		MiscFunctions.incrementStep()
 		local raycastHit =
 			MiscFunctions.raycast(start + Vector3.new(tempData.stepX, 2, tempData.stepY), start + Vector3.new(0, 4, 0))
 		if raycastHit and raycastHit ~= true and tempData.Target then
 			if not tempData.hologram then
-				tempData.hologram = game.ReplicatedStorage.ReplicatedObjects.hologram:Clone()
-				tempData.hologram.Parent = game.Workspace.ClientParts
+				tempData.hologram = ReplicatedStorage.ReplicatedObjects.hologram:Clone()
+				tempData.hologram.Parent = Workspace.ClientParts
 			end
 			local floor = MiscFunctions.raycast(start + Vector3.new(0, -9999, 0), start + Vector3.new(0, 4, 0))
 			local lookAt = CFrame.lookAt(floor, raycastHit)
@@ -91,7 +94,7 @@ end
 
 CreateEffects.animateUnderlay = function(input)
 	if input.UserInputType == Enum.UserInputType.MouseMovement then
-		local list = require(game.ReplicatedStorage.LocalClientStorage)
+		local list = require(ReplicatedStorage.Shared.LocalClientStorage)
 		local char = mouse.Target and mouse.Target.Parent
 
 		if char and char:FindFirstChild("Underlay") then
@@ -167,14 +170,14 @@ end
 
 CreateEffects.makeHologram = function(start)
 	MiscFunctions.restStep(25)
-	for count = 0, tempData.maxSteps, 1 do
+	for _ = 0, tempData.maxSteps, 1 do
 		MiscFunctions.incrementStep()
 		local raycastHit =
 			MiscFunctions.raycast(start + Vector3.new(tempData.stepX, 2, tempData.stepY), start + Vector3.new(0, 4, 0))
 		if raycastHit and raycastHit ~= true and tempData.Target then
 			if not tempData.hologram then
-				tempData.hologram = game.ReplicatedStorage.ReplicatedObjects.hologram:Clone()
-				tempData.hologram.Parent = game.Workspace.ClientParts
+				tempData.hologram = ReplicatedStorage.ReplicatedObjects.hologram:Clone()
+				tempData.hologram.Parent = Workspace.ClientParts
 			end
 			local floor = MiscFunctions.raycast(start + Vector3.new(0, -9999, 0), start + Vector3.new(0, 4, 0))
 			local lookAt = CFrame.lookAt(floor, raycastHit)
@@ -188,7 +191,7 @@ CreateEffects.makeHologram = function(start)
 				tempData.hologram:SetPrimaryPartCFrame(newCFrame)
 			end
 			return true
-		end --
+		end
 	end
 	tempData.hologram = MiscFunctions.removeObject(tempData.hologram)
 	return false
