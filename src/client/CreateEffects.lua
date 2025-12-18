@@ -1,21 +1,21 @@
---!nocheck
 local CreateEffects = {}
 
 --// Services
-local TweenService = game:GetService("TweenService")
+
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local remoteFunc = ReplicatedStorage.NPCEvents.GetNPCData
 local Workspace = game:GetService("Workspace")
+local TweenService = game:GetService("TweenService")
 
 --// Variables
 local player = Players.LocalPlayer
 local mouse = player:GetMouse()
-local playerScripts = player.PlayerScripts
+
 --// Modules
-local tempData = require(playerScripts.TempData)
-local MiscFunctions = require(playerScripts.MiscFunctions)
-local createInstances = require(playerScripts.CreateInstances)
+local tempData = require(script.Parent.TempData)
+local MiscFunctions = require(script.Parent.MiscFunctions)
+local createInstances = require(script.Parent.CreateInstances)
 
 --// Module Functions
 CreateEffects.ShowRange = function(Target, soldierRange)

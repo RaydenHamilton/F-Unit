@@ -1,10 +1,11 @@
---!nocheck
+--!strict
 --// Services
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
+local StarterGui = game:GetService("StarterGui")
 
 --// Variables
-local targets = Workspace.Targets
+local targets = Workspace:WaitForChild("Targets")
 local player = Players.LocalPlayer.UserId
 
 function CharterAdded(soldier: Model)
@@ -55,6 +56,6 @@ end
 
 targets.ChildAdded:Connect(CharterAdded)
 
-for _, v in pairs(game.StarterGui:GetChildren()) do
-	v.Parent = game.Players.LocalPlayer.PlayerGui
+for _, v in pairs(StarterGui:GetChildren()) do
+	v.Parent = Players.LocalPlayer.PlayerGui
 end

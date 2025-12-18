@@ -1,4 +1,4 @@
---!strict
+--!nocheck
 
 --// Services
 local Players = game:GetService("Players")
@@ -14,8 +14,8 @@ local data = ReplicatedStorage.Remotes.RemoteFunctions.GetDataStore:InvokeServer
 
 --// Modules
 local classes = require(ReplicatedStorage.Shared.Classes)
-local tempData = require(script.Parent.SoldierHandler.TempData)
-local MiscFunctions = require(script.Parent.SoldierHandler.MiscFunctions)
+local tempData = require(script.Parent.TempData)
+local MiscFunctions = require(script.Parent.MiscFunctions)
 
 --// Local Events
 local function Buy(button)

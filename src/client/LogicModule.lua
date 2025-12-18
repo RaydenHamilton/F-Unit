@@ -8,6 +8,7 @@ local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local client = player.PlayerScripts.Client
 local mouse = player:GetMouse()
+
 --// Modules
 local tempData = require(client.TempData)
 local miscFunctions = require(client.MiscFunctions)
