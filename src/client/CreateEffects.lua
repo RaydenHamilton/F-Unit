@@ -1,7 +1,6 @@
 local CreateEffects = {}
 
 --// Services
-
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
@@ -10,21 +9,23 @@ local TweenService = game:GetService("TweenService")
 --// Variables
 local player = Players.LocalPlayer
 local mouse = player:GetMouse()
-
+local Highlight = ReplicatedStorage.States.Highlight
+local Target = ReplicatedStorage.States.Target
+local Hologram = ReplicatedStorage.States.Hologram
 --// Modules
 local tempData = require(script.Parent.TempData)
 local MiscFunctions = require(script.Parent.MiscFunctions)
 local createInstances = require(script.Parent.CreateInstances)
 
 --// Module Functions
-CreateEffects.ShowRange = function(Target, soldierRange)
-	local rootPart = Target.PrimaryPart
+CreateEffects.ShowRange = function(target, soldierRange)
+	local rootPart = target.PrimaryPart
 	local numRays = 200 -- Number of rays in the circle
 	local last
 	for i = 0, numRays do
 		local ShotRules = RaycastParams.new()
 		ShotRules.FilterDescendantsInstances = {
-			Target,
+			target,
 			Workspace.Targets,
 			Workspace.ClientParts,
 			Workspace.walls,
@@ -68,10 +69,10 @@ CreateEffects.makeHologram = function(start)
 		MiscFunctions.incrementStep()
 		local raycastHit =
 			MiscFunctions.raycast(start + Vector3.new(tempData.stepX, 2, tempData.stepY), start + Vector3.new(0, 4, 0))
-		if raycastHit and raycastHit ~= true and tempData.Target then
-			if not tempData.hologram then
-				tempData.hologram = ReplicatedStorage.ReplicatedObjects.hologram:Clone()
-				tempData.hologram.Parent = Workspace.ClientParts
+		if raycastHit and raycastHit ~= true and Target.Value then
+			if not Hologram.Value then
+				Hologram.Value = ReplicatedStorage.ReplicatedObjects.hologram:Clone()
+				Hologram.Value.Parent = Workspace.ClientParts
 			end
 			local floor = MiscFunctions.raycast(start + Vector3.new(0, -9999, 0), start + Vector3.new(0, 4, 0))
 			local lookAt = CFrame.lookAt(floor, raycastHit)
@@ -81,13 +82,13 @@ CreateEffects.makeHologram = function(start)
 			local newCFrame = CFrame.fromOrientation(0, y, 0)
 				+ Vector3.new(math.round(lookAt.Position.X), lookAt.Position.Y, math.round(lookAt.Position.Z))
 				+ Vector3.new(0, 1, 0)
-			if tempData.hologram and tempData.hologram.PrimaryPart then
-				tempData.hologram:SetPrimaryPartCFrame(newCFrame)
+			if Hologram.Value and Hologram.Value.PrimaryPart then
+				Hologram.Value:SetPrimaryPartCFrame(newCFrame)
 			end
 			return true
 		end
 	end
-	tempData.hologram = MiscFunctions.removeObject(tempData.hologram)
+	Hologram.Value = MiscFunctions.removeObject(Hologram.Value)
 	return false
 end
 
@@ -120,19 +121,19 @@ CreateEffects.highlightCharacter = function(input)
 	repeat
 		task.wait()
 	until tempData.erroFlash ~= true
-	if input.UserInputType == Enum.UserInputType.MouseMovement and tempData.Target and not tempData.placeingWall then
+	if input.UserInputType == Enum.UserInputType.MouseMovement and Target.Value and not tempData.placeingWall then
 		if not mouse.Target or not mouse.Target.Parent then
 			return
 		end
 		local hoverOver = mouse.Target.Parent
 		if hoverOver and hoverOver:GetTags()[1] and hoverOver.Parent then
-			local owner = hoverOver:GetAttribute("owner")
+			local owner = hoverOver:GetAttribute("Owner")
 			if not owner then
 				return
 			end
 			if owner ~= player.UserId and not tempData.HealingTeamate then
 				createInstances.SetHighlight(hoverOver, Color3.new(1, 0, 0), false, false)
-			elseif owner == player.UserId and hoverOver ~= tempData.Target and tempData.HealingTeamate then
+			elseif owner == player.UserId and hoverOver ~= Target.Value and tempData.HealingTeamate then
 				createInstances.SetHighlight(hoverOver, Color3.new(0, 1, 0), false, false)
 			end
 		elseif
@@ -141,9 +142,9 @@ CreateEffects.highlightCharacter = function(input)
 			and tonumber(hoverOver.Parent:GetTags()[1]) ~= player.UserId
 		then
 			createInstances.SetHighlight(hoverOver, false, Color3.new(0, 0, 0), true)
-			tempData.hologram = MiscFunctions.removeObject(tempData.hologram)
+			Hologram.Value = MiscFunctions.removeObject(Hologram.Value)
 		else
-			tempData.characterHighlight = MiscFunctions.removeObject(tempData.characterHighlight)
+			Highlight.Value = MiscFunctions.removeObject(Highlight.Value)
 		end
 	elseif
 		mouse.Target
@@ -156,14 +157,14 @@ CreateEffects.highlightCharacter = function(input)
 	elseif
 		mouse.Target
 			and mouse.Target.Parent.Parent.Name ~= "Spawn"
-			and tempData.characterHighlight
-			and tempData.characterHighlight.Parent.Name ~= "Spawn"
-		or tempData.characterHighlight
-			and tempData.characterHighlight.OutlineColor == Color3.fromRGB(0, 0, 0)
+			and Highlight.Value
+			and Highlight.Value.Parent.Name ~= "Spawn"
+		or Highlight.Value
+			and Highlight.Value.OutlineColor == Color3.fromRGB(0, 0, 0)
 			and mouse.Target
 			and mouse.Target.Parent.Parent.Name ~= "Spawn"
 	then
-		tempData.characterHighlight = MiscFunctions.removeObject(tempData.characterHighlight)
+		Highlight.Value = MiscFunctions.removeObject(Highlight.Value)
 	end
 end
 
@@ -173,10 +174,10 @@ CreateEffects.makeHologram = function(start)
 		MiscFunctions.incrementStep()
 		local raycastHit =
 			MiscFunctions.raycast(start + Vector3.new(tempData.stepX, 2, tempData.stepY), start + Vector3.new(0, 4, 0))
-		if raycastHit and raycastHit ~= true and tempData.Target then
-			if not tempData.hologram then
-				tempData.hologram = ReplicatedStorage.ReplicatedObjects.hologram:Clone()
-				tempData.hologram.Parent = Workspace.ClientParts
+		if raycastHit and raycastHit ~= true and Target.Value then
+			if not Hologram.Value then
+				Hologram.Value = ReplicatedStorage.ReplicatedObjects.hologram:Clone()
+				Hologram.Value.Parent = Workspace.ClientParts
 			end
 			local floor = MiscFunctions.raycast(start + Vector3.new(0, -9999, 0), start + Vector3.new(0, 4, 0))
 			local lookAt = CFrame.lookAt(floor, raycastHit)
@@ -186,13 +187,13 @@ CreateEffects.makeHologram = function(start)
 			local newCFrame = CFrame.fromOrientation(0, y, 0)
 				+ Vector3.new(math.round(lookAt.Position.X), lookAt.Position.Y, math.round(lookAt.Position.Z))
 				+ Vector3.new(0, 1, 0)
-			if tempData.hologram and tempData.hologram.PrimaryPart then
-				tempData.hologram:SetPrimaryPartCFrame(newCFrame)
+			if Hologram.Value and Hologram.Value.PrimaryPart then
+				Hologram.Value:SetPrimaryPartCFrame(newCFrame)
 			end
 			return true
 		end
 	end
-	tempData.hologram = MiscFunctions.removeObject(tempData.hologram)
+	Hologram.Value = MiscFunctions.removeObject(Hologram.Value)
 	return false
 end
 

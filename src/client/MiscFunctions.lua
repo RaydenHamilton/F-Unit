@@ -12,6 +12,9 @@ local player = Players.LocalPlayer
 local Client = player.PlayerScripts.Client
 local botGui = player:WaitForChild("PlayerGui"):WaitForChild("Main")
 local mouse = player:GetMouse()
+local Highlight = ReplicatedStorage.States.Highlight
+local Target = ReplicatedStorage.States.Target
+local Hologram = ReplicatedStorage.States.Hologram
 
 --// Modules
 local tempData = require(Client.TempData)
@@ -56,9 +59,9 @@ MiscFunctions.removeObject = function(object)
 end
 
 MiscFunctions.removeObjects = function()
-	tempData.characterHighlight = MiscFunctions.removeObject(tempData.characterHighlight)
+	Highlight.Value = MiscFunctions.removeObject(Highlight.Value)
 	tempData.marker = MiscFunctions.removeObject(tempData.marker)
-	tempData.hologram = MiscFunctions.removeObject(tempData.hologram)
+	Hologram.Value = MiscFunctions.removeObject(Hologram.Value)
 end
 
 MiscFunctions.isMyNPC = function(soldier: Model)
@@ -70,16 +73,16 @@ MiscFunctions.isMyNPC = function(soldier: Model)
 end
 
 MiscFunctions.unselect = function()
-	if MiscFunctions.isMyNPC(tempData.Target) then
-		if tempData.Target:FindFirstChild("Underlay") then
-			tempData.Target.Underlay.Color = Color3.fromRGB(255, 29, 33)
+	if MiscFunctions.isMyNPC(Target.Value) then
+		if Target.Value:FindFirstChild("Underlay") then
+			Target.Value.Underlay.Color = Color3.fromRGB(255, 29, 33)
 		end
 		if tempData.selceted then
 			tempData.selceted:Disconnect()
 		end
 		botGui.Enabled = false
 		-- Clear all relevant variables at once
-		tempData.Target, tempData.HealingTeamate, tempData.partStart, tempData.placeingWall = false, false, false, false
+		Target.Value, tempData.HealingTeamate, tempData.partStart, tempData.placeingWall = false, false, false, false
 	end
 	MiscFunctions.removeObjects()
 end

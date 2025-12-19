@@ -11,6 +11,8 @@ local sandbag = ReplicatedStorage.ReplicatedObjects.Sandbag
 local player = Players.LocalPlayer
 local NPCEvents = ReplicatedStorage.NPCEvents
 local Client = player.PlayerScripts.Client
+local highlight = ReplicatedStorage.States.Highlight
+local Target = ReplicatedStorage.States.Target
 
 --// Modules
 local tempData = require(Client.TempData)
@@ -29,20 +31,20 @@ local botGui = player:WaitForChild("PlayerGui"):WaitForChild("Main")
 
 --// Module Functions
 EventModule.crawl = function()
-	setPose:FireServer("crawl", tempData.Target)
+	setPose:FireServer("crawl", Target.Value)
 end
 
 EventModule.crouch = function()
-	setPose:FireServer("crouch", tempData.Target)
+	setPose:FireServer("crouch", Target.Value)
 end
 
 EventModule.stand = function()
-	setPose:FireServer("stand", tempData.Target)
+	setPose:FireServer("stand", Target.Value)
 end
 
 EventModule.placeWall = function()
 	tempData.placeingWall = true
-	local Walls = tempData.Target:GetAttribute("Walls")
+	local Walls = Target.Value:GetAttribute("Walls")
 	if not tempData.marker then
 		MiscFunctions.removeObjects()
 		tempData.marker = createInstances.setUpMarker(mouse)
@@ -66,7 +68,7 @@ EventModule.placeWall = function()
 					size,
 					tempData.partStart - Vector3.new(0, tempData.marker.Size.Y / 2, 0),
 					partEnd,
-					tempData.Target
+					Target.Value
 				)
 			end
 			MiscFunctions.unselect()
@@ -96,7 +98,7 @@ EventModule.placeWall = function()
 end
 
 EventModule.clickSelfHeal = function()
-	heal:FireServer(tempData.Target, tempData.Target)
+	heal:FireServer(Target.Value, Target.Value)
 	MiscFunctions.unselect()
 end
 
@@ -113,8 +115,8 @@ EventModule.clickedPlaceWall = function()
 end
 
 EventModule.OpenBunker = function()
-	if tempData.characterHighlight and tempData.characterHighlight.Parent.Name == "Door Closed" then
-		NPCEvents.PlantBomb:FireServer(mouse.Hit.Position, tempData.Target, tempData.characterHighlight.Parent)
+	if highlight.Value and highlight.Value.Parent.Name == "Door Closed" then
+		NPCEvents.PlantBomb:FireServer(mouse.Hit.Position, Target.Value, highlight.Value.Parent)
 		MiscFunctions.unselect()
 		return true
 	end
@@ -122,22 +124,22 @@ EventModule.OpenBunker = function()
 end
 
 EventModule.clickNewEnemy = function()
-	if tempData.characterHighlight and tempData.characterHighlight.Parent.Parent.Name == "Targets" then
-		NPCEvents.NewTarget:FireServer(tempData.characterHighlight.Parent, tempData.Target)
+	if highlight.Value and highlight.Value.Parent.Parent.Name == "Targets" then
+		NPCEvents.NewTarget:FireServer(highlight.Value.Parent, Target.Value)
 		MiscFunctions.removeObjects()
 	end
 end
 
 EventModule.MoveTo = function()
-	if tempData.Target and mouse.Target and tempData.newposition then
-		move:FireServer(tempData.newposition, tempData.Target, createEffects.makeHologram(tempData.newposition))
+	if Target.Value and mouse.Target and tempData.newposition then
+		move:FireServer(tempData.newposition, Target.Value, createEffects.makeHologram(tempData.newposition))
 		MiscFunctions.unselect()
 	end
 end
 
 EventModule.hoverHealableWho = function()
 	if MiscFunctions.isMyNPC(mouse.Target.Parent) then
-		heal:FireServer(tempData.Target, mouse.Target.Parent)
+		heal:FireServer(Target.Value, mouse.Target.Parent)
 		MiscFunctions.unselect()
 	end
 end

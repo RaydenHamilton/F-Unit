@@ -33,9 +33,6 @@ local function buySoldier(player: Player, soldierType, spawn: Model)
 		local localDirection = Vector3.new(math.cos(angle), 0, math.sin(angle)) -- Direction in rootPart's local space
 		local direction = rootPart.CFrame:VectorToWorldSpace(localDirection) -- Convert to world space relative to rootPart
 
-		local cost = soldierClasses[soldierType[i]].Cost
-		PlayerInstances[player.UserId]:RemovePoints(cost)
-
 		local soldier: Model = ReplicatedStorage.SoldierCopys[soldierType[i]]:Clone()
 		soldier.Parent = Workspace.Targets;
 
@@ -76,7 +73,11 @@ SpawnInit.OnServerInvoke = function(player, tabName: string, className: string, 
 		local classInfo = classes[className]
 		if PlayerInstances[player.UserId].Points >= classInfo.Cost then
 			PlayerInstances[player.UserId]:RemovePoints(classInfo.Cost)
-			buySoldier(player, { className }, spawn)
+			if tabName == "Soldiers" then
+				buySoldier(player, { className }, spawn)
+			elseif tabName == "Squads" then
+				buySoldier(player, className, spawn)
+			end
 			return true
 		end
 	end

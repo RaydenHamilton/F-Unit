@@ -67,10 +67,7 @@ end
 local function Reload(soldierData: SoldierData)
 	soldierData.Shots += 1
 	if soldierData.Shots >= soldierData.Class.ClipSize then
-		if
-			soldierData.Soldier:GetAttribute(SoldierClass.Controls.Covering)
-			and not soldierAnimation.isRunning(soldierData)
-		then
+		if soldierData.Soldier:GetAttribute("Covering") and not soldierAnimation.isRunning(soldierData) then
 			-- cover
 			soldierData.State = soldierAnimation.PlayAnim(10, soldierData.Humanoid, soldierData.Loaded)
 		end
@@ -81,7 +78,7 @@ local function Reload(soldierData: SoldierData)
 		task.wait(soldierData.Class.ReloadTime)
 	end
 	task.wait(soldierData.Class["FiringRate"])
-	soldierData.Soldier:SetAttribute(SoldierClass.Controls.GunCoolDown, false)
+	soldierData.Soldier:SetAttribute("GunCoolDown", false)
 end
 
 local function FireGun(soldierData: SoldierData)
@@ -133,10 +130,7 @@ local function FireGun(soldierData: SoldierData)
 end
 
 local function CanFireAt(soldierData: SoldierData) -- shoots as long as there is no cool down
-	if
-		not soldierData.Soldier:GetAttribute(SoldierClass.Controls.GunCoolDown)
-		and soldierData.LastEnemieSet - tick() < 0
-	then
+	if not soldierData.Soldier:GetAttribute("GunCoolDown") and soldierData.LastEnemieSet - tick() < 0 then
 		soldierData.DistanceToCloses = (
 			soldierData.ClosesEnemy.HumanoidRootPart.Position - soldierData.HumanoidRootPart.Position
 		).Magnitude
@@ -239,9 +233,9 @@ local function CanShootEnemy(soldierData: SoldierData)
 			GetNewEnemy(soldierData)
 			LookAtEnemy(soldierData)
 		elseif
-			soldierData.Soldier:GetAttribute(SoldierClass.Controls.Building)
-			or soldierData.Soldier:GetAttribute(SoldierClass.Controls.Healing)
-			or soldierData.Soldier:GetAttribute(SoldierClass.Controls.PlantingBomb)
+			soldierData.Soldier:GetAttribute("Building")
+			or soldierData.Soldier:GetAttribute("Healing")
+			or soldierData.Soldier:GetAttribute("PlantingBomb")
 		then
 			SoldierEvents.SetPose(nil, soldierData.Soldier:GetAttribute("Pose"), soldierData.Soldier, soldierData)
 		end
@@ -289,7 +283,6 @@ function SoldierModule.new(id: number, soldier: Model, class)
 	--Data Init---
 	soldier:SetAttribute("Pose", "Stand")
 	soldier:SetAttribute("Owner", id)
-	print(class)
 	---Controls---
 	soldier:SetAttribute("Covering", false)
 	soldier:SetAttribute("Building", false)

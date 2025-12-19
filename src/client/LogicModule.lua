@@ -3,11 +3,13 @@ local LogicModule = {}
 
 --// Services
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 --// Variables
 local player = Players.LocalPlayer
 local client = player.PlayerScripts.Client
 local mouse = player:GetMouse()
+local Target = ReplicatedStorage.States.Target
 
 --// Modules
 local tempData = require(client.TempData)
@@ -19,8 +21,8 @@ local createEffects = require(client.CreateEffects)
 LogicModule.canWalkTo = function(input)
 	if
 		input.UserInputType == Enum.UserInputType.MouseMovement
-		and tempData.Target
-		and tempData.Target:FindFirstChild("Underlay")
+		and Target.Value
+		and Target.Value:FindFirstChild("Underlay")
 	then
 		if tempData.whatStepIsItOn > tempData.maxSteps then
 			miscFunctions.restStep(50)
@@ -39,8 +41,8 @@ end
 LogicModule.createwalkpart = function(position)
 	local path = game:GetService("PathfindingService")
 		:CreatePath({ AgentCanJump = false, AgentRadius = 1.7, WaypointSpacing = 1, Costs = { Center = 0.1 } }) --
-	if (position - tempData.Target["Underlay"].Position).magnitude < 999 then
-		path:ComputeAsync(tempData.Target["Underlay"].Position, position)
+	if (position - Target.Value["Underlay"].Position).magnitude < 999 then
+		path:ComputeAsync(Target.Value["Underlay"].Position, position)
 		local waypoints = path:GetWaypoints()
 		if path.Status == Enum.PathStatus.Success then
 			return waypoints[#waypoints].Position

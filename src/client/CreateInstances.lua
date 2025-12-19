@@ -1,9 +1,15 @@
 --!nocheck
 local CreatePart = {}
 
+--// Services
 local Workspace = game:GetService("Workspace")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+--// Modules
 local tempData = require(script.Parent.TempData)
+
+--// Variables
+local highlight = ReplicatedStorage.States.Highlight
 
 CreatePart.makeBillboardGui = function(marker)
 	local gui = Instance.new("BillboardGui")
@@ -41,14 +47,14 @@ CreatePart.SetHighlight = function(
 	OutlineColor: Color3 | boolean,
 	DepthMode: boolean
 )
-	if not tempData.characterHighlight then
-		tempData.characterHighlight = Instance.new("Highlight")
+	if not highlight.Value then
+		highlight.Value = Instance.new("Highlight")
 	end
-	tempData.characterHighlight.FillTransparency = DepthMode and 1 or tempData.characterHighlight.FillTransparency
-	tempData.characterHighlight.Parent = Parent
-	tempData.characterHighlight.FillColor = FillColor or tempData.characterHighlight.OutlineColor
-	tempData.characterHighlight.OutlineColor = OutlineColor or tempData.characterHighlight.OutlineColor
-	tempData.characterHighlight.DepthMode = DepthMode and "Occluded" or tempData.characterHighlight.DepthMode
+	highlight.Value.FillTransparency = DepthMode and 1 or highlight.Value.FillTransparency
+	highlight.Value.Parent = Parent
+	highlight.Value.FillColor = FillColor or highlight.Value.OutlineColor
+	highlight.Value.OutlineColor = OutlineColor or highlight.Value.OutlineColor
+	highlight.Value.DepthMode = DepthMode and "Occluded" or highlight.Value.DepthMode
 end
 
 return CreatePart

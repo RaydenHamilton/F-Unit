@@ -114,12 +114,12 @@ soldierAnimation.SetState = function(Speed: number, soldierData: SoldierData)
 	end
 
 	if soldierData.StateQueue[#soldierData.StateQueue] == 0 then
-		if soldierData.Soldier:GetAttribute(SoldierClass.Controls.Covering) then
+		if soldierData.Soldier:GetAttribute("Covering") then
 			state = 10 -- hiding
 		elseif
-			soldierData.Soldier:GetAttribute(SoldierClass.Controls.Building)
-			or soldierData.Soldier:GetAttribute(SoldierClass.Controls.Healing)
-			or soldierData.Soldier:GetAttribute(SoldierClass.Controls.PlantingBomb)
+			soldierData.Soldier:GetAttribute("Building")
+			or soldierData.Soldier:GetAttribute("Healing")
+			or soldierData.Soldier:GetAttribute("PlantingBomb")
 		then
 			state = 12 -- building
 		elseif soldierData.ClosesEnemy then

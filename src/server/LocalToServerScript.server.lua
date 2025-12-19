@@ -14,8 +14,3 @@ ReplicatedStorage.Remotes.RemoteFunctions.GetDataStore.OnServerInvoke = function
 	end)
 	return data
 end
-
--- ReplicatedStorage.NPCEvents.GetNPCData.OnServerInvoke = function(Player, char, var)
---if not (char or var) or not NPCDataTable[char] then return nil end
---return NPCDataTable[char][var]
--- end

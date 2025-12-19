@@ -10,13 +10,13 @@ local tabs = player.PlayerGui:WaitForChild("ShopUI")
 local options = tabs.Options
 local GetPlayerMoney = 100
 local points = player.PlayerGui.HudUI.Points.MPNumber
+local highlight = ReplicatedStorage.States.Highlight
 
 --// Modules
 local SoldierClasses = require(ReplicatedStorage.Shared.SoldierClasses)
 local SquadClasses = require(ReplicatedStorage.Shared.SquadClasses)
 local WeaponClasses = require(ReplicatedStorage.Shared.WeaponClasses)
 local VehicleClasses = require(ReplicatedStorage.Shared.VehicleClasses)
-local TempData = require(player:WaitForChild("PlayerScripts"):WaitForChild("Client").TempData)
 
 --// Local Events
 local function LoadButtons(tabName, classes)
@@ -34,7 +34,7 @@ local function LoadButtons(tabName, classes)
 				local success = ReplicatedStorage.Remotes.RemoteFunctions.SpawnInit:InvokeServer(
 					tabName,
 					className,
-					TempData.characterHighlight.Parent
+					highlight.Value.Parent
 				)
 				if success then
 					GetPlayerMoney = GetPlayerMoney - classInfo.Cost
@@ -42,7 +42,7 @@ local function LoadButtons(tabName, classes)
 					button.Parent.Visible = false
 					options.Visible = true
 					tabs.Enabled = false
-					TempData.characterHighlight.Enabled = false
+					highlight.Value.Enabled = false
 				end
 			end
 		end)

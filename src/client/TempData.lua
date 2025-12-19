@@ -14,7 +14,6 @@ local TempData = {
 	["newposition"] = nil,
 	["marker"] = nil,
 	["start"] = nil,
-	["characterHighlight"] = nil,
 	["HealingTeamate"] = nil,
 	["placeingWall"] = nil,
 	["Target"] = nil,

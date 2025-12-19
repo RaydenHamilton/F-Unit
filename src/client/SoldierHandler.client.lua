@@ -4,12 +4,13 @@
 local RunService = game:GetService("RunService")
 local WorkSpace = game:GetService("Workspace")
 local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 --// Modules
 local Modules = Players.LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("Client")
 -- local createInstances = require(script.CreateInstances)
 local createEffects = require(Modules:WaitForChild("CreateEffects"))
-local tempData = require(Modules.TempData)
+local self = require(Modules.TempData)
 local miscFunctions = require(Modules.MiscFunctions)
 local eventModule = require(Modules.EventModule)
 local logicModule = require(Modules.LogicModule)
@@ -20,6 +21,8 @@ local botGui = player:WaitForChild("PlayerGui"):WaitForChild("Main")
 local actions = botGui.Actions
 local position = botGui.Position
 local mouse = player:GetMouse()
+local Highlight = ReplicatedStorage.States.Highlight
+local Target = ReplicatedStorage.States.Target
 
 --// Gui
 local wallButton = botGui["Build"].Background.ImageButton
@@ -35,39 +38,38 @@ local function changeSoldier()
 	local selected = mouse.Target
 	player.PlayerGui.ShopUI.Enabled = false
 	if selected and tonumber(selected.Parent:GetAttribute("Owner")) == player.UserId then
-		print("Selected Soldier")
-		tempData.Target = selected.Parent
-		local Walls = tempData.Target:GetAttribute("Walls")
-		local Meds = tempData.Target:GetAttribute("Meds")
+		Target.Value = selected.Parent
+
+		local Walls = Target.Value:GetAttribute("Walls")
+		local Meds = Target.Value:GetAttribute("Meds")
 		player.PlayerGui.Main.Heals.Number.Text = Meds
 		player.PlayerGui.Main.Walls.Number.Text = Walls
 
-		tempData.Target.Underlay.Color = Color3.new(1, 1, 1)
+		Target.Value.Underlay.Color = Color3.new(1, 1, 1)
 		botGui.Enabled = true
-		tempData.soldierRange = tempData.Target:GetAttribute("Range")
 		local ShotRules = RaycastParams.new()
 		ShotRules.FilterDescendantsInstances = {
-			tempData.Target,
+			Target.Value,
 		}
 		ShotRules.FilterType = Enum.RaycastFilterType.Exclude
 		ShotRules.IgnoreWater = true
 
-		tempData.selceted = RunService.RenderStepped:Connect(function()
-			createEffects.ShowRange(tempData.Target, tempData.soldierRange)
+		self.selceted = RunService.RenderStepped:Connect(function()
+			createEffects.ShowRange(Target.Value, Target.Value:GetAttribute("Range"))
 		end)
 	end
 end
 
 local function FlashOutLine()
-	tempData.erroFlash = true
-	for i = 0, 1 do
-		tempData.characterHighlight.OutlineColor = Color3.new(1, 1, 1)
+	self.erroFlash = true
+	for _ = 0, 1 do
+		Highlight.Value.OutlineColor = Color3.new(1, 1, 1)
 		task.wait(0.1)
-		tempData.characterHighlight.OutlineColor = Color3.new(0, 0, 0)
+		Highlight.Value.OutlineColor = Color3.new(0, 0, 0)
 		task.wait(0.1)
 	end
-	tempData.erroFlash = false
-	tempData.characterHighlight = miscFunctions.removeObject(tempData.characterHighlight)
+	self.erroFlash = false
+	Highlight.Value = miscFunctions.removeObject(Highlight.Value)
 end
 
 local function onLelfClick()
@@ -76,8 +78,8 @@ local function onLelfClick()
 		target
 		and target.Parent
 		and mouse.Target.Parent.Parent.Name == "Spawn"
-		and tempData.characterHighlight
-		and tempData.characterHighlight.Parent
+		and Highlight.Value
+		and Highlight.Value.Parent
 	then
 		local spawnModel = mouse.Target.Parent.Parent
 		local Params = OverlapParams.new()
@@ -86,17 +88,17 @@ local function onLelfClick()
 		local getTouchingParts =
 			WorkSpace:GetPartBoundsInBox(spawnModel.PrimaryPart.CFrame, Vector3.new(20, 20, 20), Params)
 		if #getTouchingParts == 0 then
-			tempData.characterHighlight.OutlineColor = Color3.new(1, 1, 1)
+			Highlight.Value.OutlineColor = Color3.new(1, 1, 1)
 			player.PlayerGui.ShopUI.Enabled = true
-		elseif not tempData.erroFlash then
+		elseif not self.erroFlash then
 			FlashOutLine()
 		end
 	elseif miscFunctions.ifNot() then
 		eventModule.clickNewEnemy()
 		changeSoldier()
-	elseif tempData.placeingWall then
+	elseif self.placeingWall then
 		eventModule.placeWall()
-	elseif tempData.HealingTeamate then
+	elseif self.HealingTeamate then
 		eventModule.hoverHealableWho()
 	end
 end
