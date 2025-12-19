@@ -4,7 +4,6 @@ local CreateEffects = {}
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
-local remoteFunc = ReplicatedStorage.NPCEvents.GetNPCData
 local Workspace = game:GetService("Workspace")
 local TweenService = game:GetService("TweenService")
 
@@ -127,7 +126,7 @@ CreateEffects.highlightCharacter = function(input)
 		end
 		local hoverOver = mouse.Target.Parent
 		if hoverOver and hoverOver:GetTags()[1] and hoverOver.Parent then
-			local owner = remoteFunc:InvokeServer(hoverOver:GetTags()[1], "owner")
+			local owner = hoverOver:GetAttribute("owner")
 			if not owner then
 				return
 			end

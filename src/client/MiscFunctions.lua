@@ -12,7 +12,6 @@ local player = Players.LocalPlayer
 local Client = player.PlayerScripts.Client
 local botGui = player:WaitForChild("PlayerGui"):WaitForChild("Main")
 local mouse = player:GetMouse()
-local remoteFunc = ReplicatedStorage.NPCEvents.GetNPCData
 
 --// Modules
 local tempData = require(Client.TempData)
@@ -64,15 +63,14 @@ end
 
 MiscFunctions.isMyNPC = function(soldier: Model)
 	if soldier then
-		local owner = remoteFunc:InvokeServer(soldier, "owner")
-		return owner == player.UserId
+		return soldier:GetAttribute("Owner") == player.UserId
 	else
 		return false
 	end
 end
 
 MiscFunctions.unselect = function()
-	if MiscFunctions.isMyNPC(tempData.Target) and tempData.Target then
+	if MiscFunctions.isMyNPC(tempData.Target) then
 		if tempData.Target:FindFirstChild("Underlay") then
 			tempData.Target.Underlay.Color = Color3.fromRGB(255, 29, 33)
 		end

@@ -2,7 +2,6 @@
 
 --// Services
 local RunService = game:GetService("RunService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local WorkSpace = game:GetService("Workspace")
 local Players = game:GetService("Players")
 
@@ -21,7 +20,6 @@ local botGui = player:WaitForChild("PlayerGui"):WaitForChild("Main")
 local actions = botGui.Actions
 local position = botGui.Position
 local mouse = player:GetMouse()
-local remoteFunc = ReplicatedStorage.NPCEvents.GetNPCData
 
 --// Gui
 local wallButton = botGui["Build"].Background.ImageButton
@@ -36,20 +34,17 @@ local function changeSoldier()
 	miscFunctions.unselect()
 	local selected = mouse.Target
 	player.PlayerGui.ShopUI.Enabled = false
-	if
-		selected
-		and #selected.Parent:GetTags() == 1
-		and remoteFunc:InvokeServer(selected.Parent:GetTags()[1], "owner") == player.UserId
-	then
+	if selected and tonumber(selected.Parent:GetAttribute("Owner")) == player.UserId then
+		print("Selected Soldier")
 		tempData.Target = selected.Parent
-		local Walls = remoteFunc:InvokeServer(tempData.Target:GetTags()[1], "Walls")
-		local Meds = remoteFunc:InvokeServer(tempData.Target:GetTags()[1], "meds")
+		local Walls = tempData.Target:GetAttribute("Walls")
+		local Meds = tempData.Target:GetAttribute("Meds")
 		player.PlayerGui.Main.Heals.Number.Text = Meds
 		player.PlayerGui.Main.Walls.Number.Text = Walls
 
 		tempData.Target.Underlay.Color = Color3.new(1, 1, 1)
 		botGui.Enabled = true
-		tempData.soldierRange = remoteFunc:InvokeServer(tempData.Target:GetTags()[1], "class").Range
+		tempData.soldierRange = tempData.Target:GetAttribute("Range")
 		local ShotRules = RaycastParams.new()
 		ShotRules.FilterDescendantsInstances = {
 			tempData.Target,

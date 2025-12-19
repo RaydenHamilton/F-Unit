@@ -41,9 +41,8 @@ EventModule.stand = function()
 end
 
 EventModule.placeWall = function()
-	local remoteFunc = ReplicatedStorage.NPCEvents.GetNPCData
 	tempData.placeingWall = true
-	local Walls = remoteFunc:InvokeServer(tempData.Target, "Walls")
+	local Walls = tempData.Target:GetAttribute("Walls")
 	if not tempData.marker then
 		MiscFunctions.removeObjects()
 		tempData.marker = createInstances.setUpMarker(mouse)

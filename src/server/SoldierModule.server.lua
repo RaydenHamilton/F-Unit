@@ -1,5 +1,0 @@
--- local function setClosesEnemy(_, enemy, selectedSoldier, soldierData)
--- 	if selectedSoldier == soldierData.Soldier then
--- 		soldierData.ClosesEnemy = enemy
--- 	end
--- end

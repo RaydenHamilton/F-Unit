@@ -1,0 +1,43 @@
+Note:
+    make all solder beable to do everything but only add the buttons on the screen that they can use
+
+TODO:
+    bugs:
+
+    -add granades
+    -make path finding better: ie move out of the way of others and not run in to each other
+    -update scripts for sandbags - places ment is good but the destorying of them is bad
+    -make explosions move sand bags
+    
+
+
+    squad buttons:
+        recruits: 60 mp
+        assault infantry: 110 mp 
+        regular infantry: 130 mp
+        paratroopers: 200 mp
+        snlf: 300 mp
+        machanized snlf: 450 mp
+        combat engineer: 150 mp
+        mine disosal: 50 mp
+        combat engineer: 200 mp
+
+    single solder buttons:
+    
+Types:
+    Rifle Man: 12 mp
+    SMG: 12 mp
+    Tank crew: 10 mp
+    shotgunners: 60 mp
+    sniper: 160 mp
+    Machine gunner: 50 mp
+    AT infantry: 70 mp
+
+Later Types:
+
+    Elite marksmen: 140 mp
+    Elite AT infantry: 135 mp
+    Elite support infantry: 125 mp
+    flamethrower: 75 mp
+    officer: 200 mp
+

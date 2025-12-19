@@ -7,17 +7,17 @@ class.AR = {
 	["Damage"] = 30,
 	["FiringRate"] = 0.5,
 	["Range"] = 200,
-	["ReloadTime"] = 1
+	["ReloadTime"] = 1,
 }
 
 class.SMG = {
 	["Cost"] = 25,
 	["Bloom"] = 5,
-	["ClipSize"] = 6 ,
+	["ClipSize"] = 6,
 	["Damage"] = 75,
 	["FiringRate"] = 0.5,
 	["Range"] = 200,
-	["ReloadTime"] = 1
+	["ReloadTime"] = 1,
 }
 
 class.Sniper = {
@@ -27,7 +27,7 @@ class.Sniper = {
 	["Damage"] = 85,
 	["FiringRate"] = 2.75,
 	["Range"] = 200,
-	["ReloadTime"] = 6
+	["ReloadTime"] = 6,
 }
 
 class.LMG = {
@@ -37,7 +37,7 @@ class.LMG = {
 	["Damage"] = 24,
 	["FiringRate"] = 0.25,
 	["Range"] = 200,
-	["ReloadTime"] = 4
+	["ReloadTime"] = 4,
 }
 
 class.Rifle = {
@@ -47,8 +47,25 @@ class.Rifle = {
 	["Damage"] = 75,
 	["FiringRate"] = 2.75,
 	["Range"] = 200,
-	["ReloadTime"] = 6
+	["ReloadTime"] = 6,
 }
 
+class.Shotgun = {
+	["Cost"] = 25,
+	["Bloom"] = 20,
+	["ClipSize"] = 2,
+	["Damage"] = 90,
+	["FiringRate"] = 1,
+	["Range"] = 50,
+	["ReloadTime"] = 3,
+}
+
+class.tankoperator = {
+	["Cost"] = 100,
+	["Speed"] = 50,
+	["Health"] = 500,
+	["Damage"] = 100,
+	["ReloadTime"] = 5,
+}
 
 return class
