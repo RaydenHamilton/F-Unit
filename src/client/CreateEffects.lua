@@ -13,7 +13,7 @@ local Highlight = ReplicatedStorage.States.Highlight
 local Target = ReplicatedStorage.States.Target
 local Hologram = ReplicatedStorage.States.Hologram
 --// Modules
-local tempData = require(script.Parent.TempData)
+local ClientStates = require(script.Parent.ClientStates)
 local MiscFunctions = require(script.Parent.MiscFunctions)
 local createInstances = require(script.Parent.CreateInstances)
 
@@ -65,10 +65,12 @@ end
 
 CreateEffects.makeHologram = function(start)
 	MiscFunctions.restStep(25)
-	for _ = 0, tempData.maxSteps, 1 do
+	for _ = 0, ClientStates.maxSteps, 1 do
 		MiscFunctions.incrementStep()
-		local raycastHit =
-			MiscFunctions.raycast(start + Vector3.new(tempData.stepX, 2, tempData.stepY), start + Vector3.new(0, 4, 0))
+		local raycastHit = MiscFunctions.raycast(
+			start + Vector3.new(ClientStates.stepX, 2, ClientStates.stepY),
+			start + Vector3.new(0, 4, 0)
+		)
 		if raycastHit and raycastHit ~= true and Target.Value then
 			if not Hologram.Value then
 				Hologram.Value = ReplicatedStorage.ReplicatedObjects.hologram:Clone()
@@ -118,10 +120,7 @@ CreateEffects.animateUnderlay = function(input)
 end
 
 CreateEffects.highlightCharacter = function(input)
-	repeat
-		task.wait()
-	until tempData.erroFlash ~= true
-	if input.UserInputType == Enum.UserInputType.MouseMovement and Target.Value and not tempData.placeingWall then
+	if input.UserInputType == Enum.UserInputType.MouseMovement and Target.Value and not ClientStates.placeingWall then
 		if not mouse.Target or not mouse.Target.Parent then
 			return
 		end
@@ -131,9 +130,9 @@ CreateEffects.highlightCharacter = function(input)
 			if not owner then
 				return
 			end
-			if owner ~= player.UserId and not tempData.HealingTeamate then
+			if owner ~= player.UserId and not ClientStates.HealingTeamate then
 				createInstances.SetHighlight(hoverOver, Color3.new(1, 0, 0), false, false)
-			elseif owner == player.UserId and hoverOver ~= Target.Value and tempData.HealingTeamate then
+			elseif owner == player.UserId and hoverOver ~= Target.Value and ClientStates.HealingTeamate then
 				createInstances.SetHighlight(hoverOver, Color3.new(0, 1, 0), false, false)
 			end
 		elseif
@@ -170,10 +169,12 @@ end
 
 CreateEffects.makeHologram = function(start)
 	MiscFunctions.restStep(25)
-	for _ = 0, tempData.maxSteps, 1 do
+	for _ = 0, ClientStates.maxSteps, 1 do
 		MiscFunctions.incrementStep()
-		local raycastHit =
-			MiscFunctions.raycast(start + Vector3.new(tempData.stepX, 2, tempData.stepY), start + Vector3.new(0, 4, 0))
+		local raycastHit = MiscFunctions.raycast(
+			start + Vector3.new(ClientStates.stepX, 2, ClientStates.stepY),
+			start + Vector3.new(0, 4, 0)
+		)
 		if raycastHit and raycastHit ~= true and Target.Value then
 			if not Hologram.Value then
 				Hologram.Value = ReplicatedStorage.ReplicatedObjects.hologram:Clone()

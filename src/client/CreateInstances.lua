@@ -5,9 +5,6 @@ local CreatePart = {}
 local Workspace = game:GetService("Workspace")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
---// Modules
-local tempData = require(script.Parent.TempData)
-
 --// Variables
 local highlight = ReplicatedStorage.States.Highlight
 

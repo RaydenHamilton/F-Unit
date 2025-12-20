@@ -13,9 +13,10 @@ local NPCEvents = ReplicatedStorage.NPCEvents
 local Client = player.PlayerScripts.Client
 local highlight = ReplicatedStorage.States.Highlight
 local Target = ReplicatedStorage.States.Target
+local Marker = ReplicatedStorage.States.Marker
 
 --// Modules
-local tempData = require(Client.TempData)
+local ClientStates = require(Client.ClientStates)
 local MiscFunctions = require(Client.MiscFunctions)
 local createInstances = require(Client.CreateInstances)
 local createEffects = require(Client.CreateEffects)
@@ -43,30 +44,30 @@ EventModule.stand = function()
 end
 
 EventModule.placeWall = function()
-	tempData.placeingWall = true
+	ClientStates.placeingWall = true
 	local Walls = Target.Value:GetAttribute("Walls")
-	if not tempData.marker then
+	if not Marker.Value then
 		MiscFunctions.removeObjects()
-		tempData.marker = createInstances.setUpMarker(mouse)
-		while tempData.placeingWall and task.wait() and tempData.marker do
-			tempData.marker.Position = mouse.Hit.Position + Vector3.new(0, tempData.marker.Size.Y / 2, 0)
+		Marker.Value = createInstances.setUpMarker(mouse)
+		while ClientStates.placeingWall and task.wait() and Marker.Value do
+			Marker.Value.Position = mouse.Hit.Position + Vector3.new(0, Marker.Value.Size.Y / 2, 0)
 			if not MiscFunctions.MouseIsInregion() then
-				tempData.marker.Color = Color3.new(1, 0, 0)
+				Marker.Value.Color = Color3.new(1, 0, 0)
 			else
-				tempData.marker.Color = Color3.new(0, 0, 1)
+				Marker.Value.Color = Color3.new(0, 0, 1)
 			end
 		end
 	end
-	if tempData.marker and not MiscFunctions.MouseIsInregion() then
+	if Marker.Value and not MiscFunctions.MouseIsInregion() then
 		MiscFunctions.unselect()
-	elseif tempData.marker then
-		if tempData.partStart then
-			local size = math.round((tempData.marker.Size.Z / sandbag.Size.Z) / 0.6)
+	elseif Marker.Value then
+		if ClientStates.partStart then
+			local size = math.round((Marker.Value.Size.Z / sandbag.Size.Z) / 0.6)
 			local partEnd = mouse.Hit.Position
-			if tempData.marker.Color == Color3.new(0, 0, 1) then
+			if Marker.Color == Color3.new(0, 0, 1) then
 				placeObject:FireServer(
 					size,
-					tempData.partStart - Vector3.new(0, tempData.marker.Size.Y / 2, 0),
+					ClientStates.partStart - Vector3.new(0, Marker.Size.Y / 2, 0),
 					partEnd,
 					Target.Value
 				)
@@ -74,23 +75,23 @@ EventModule.placeWall = function()
 			MiscFunctions.unselect()
 			return
 		end
-		local text = createInstances.makeBillboardGui(tempData.marker)
-		tempData.partStart = mouse.Hit.Position + Vector3.new(0, tempData.marker.Size.Y / 2, 0)
-		while task.wait() and tempData.marker do
-			if tempData.partStart then
-				tempData.marker.CFrame = CFrame.lookAt(
-					(tempData.partStart + mouse.Hit.Position) / 2 + Vector3.new(0, tempData.marker.Size.Y / 4, 0),
-					mouse.Hit.Position + Vector3.new(0, tempData.marker.Size.Y / 2, 0)
+		local text = createInstances.makeBillboardGui(Marker.Value)
+		ClientStates.partStart = mouse.Hit.Position + Vector3.new(0, Marker.Value.Size.Y / 2, 0)
+		while task.wait() and Marker.Value do
+			if ClientStates.partStart then
+				Marker.Value.CFrame = CFrame.lookAt(
+					(ClientStates.partStart + mouse.Hit.Position) / 2 + Vector3.new(0, Marker.Value.Size.Y / 4, 0),
+					mouse.Hit.Position + Vector3.new(0, Marker.Value.Size.Y / 2, 0)
 				)
-				tempData.marker.Size = Vector3.new(1, 3, (tempData.partStart - mouse.Hit.Position).Magnitude)
-				text.Text = math.round((tempData.marker.Size.Z / sandbag.Size.Z) / 0.6)
+				Marker.Value.Size = Vector3.new(1, 3, (ClientStates.partStart - mouse.Hit.Position).Magnitude)
+				text.Text = math.round((Marker.Value.Size.Z / sandbag.Size.Z) / 0.6)
 				if
-					math.round((tempData.marker.Size.Z / sandbag.Size.Z) / 0.6) > Walls
+					math.round((Marker.Value.Size.Z / sandbag.Size.Z) / 0.6) > Walls
 					or not MiscFunctions.MouseIsInregion()
 				then
-					tempData.marker.Color = Color3.new(1, 0, 0)
+					Marker.Value.Color = Color3.new(1, 0, 0)
 				else
-					tempData.marker.Color = Color3.new(0, 0, 1)
+					Marker.Value.Color = Color3.new(0, 0, 1)
 				end
 			end
 		end
@@ -104,12 +105,12 @@ end
 
 EventModule.clickedHeal = function()
 	botGui.Enabled = false
-	tempData.HealingTeamate = true
+	ClientStates.HealingTeamate = true
 	MiscFunctions.removeObjects()
 end
 
 EventModule.clickedPlaceWall = function()
-	tempData.placeingWall = true
+	ClientStates.placeingWall = true
 	botGui.Enabled = false
 	EventModule.placeWall()
 end
@@ -125,14 +126,15 @@ end
 
 EventModule.clickNewEnemy = function()
 	if highlight.Value and highlight.Value.Parent.Parent.Name == "Targets" then
+		-- Makes them target the new enemy
 		NPCEvents.NewTarget:FireServer(highlight.Value.Parent, Target.Value)
 		MiscFunctions.removeObjects()
 	end
 end
 
 EventModule.MoveTo = function()
-	if Target.Value and mouse.Target and tempData.newposition then
-		move:FireServer(tempData.newposition, Target.Value, createEffects.makeHologram(tempData.newposition))
+	if Target.Value and mouse.Target and ClientStates.newposition then
+		move:FireServer(ClientStates.newposition, Target.Value, createEffects.makeHologram(ClientStates.newposition))
 		MiscFunctions.unselect()
 	end
 end

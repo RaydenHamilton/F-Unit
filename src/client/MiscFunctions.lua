@@ -15,40 +15,41 @@ local mouse = player:GetMouse()
 local Highlight = ReplicatedStorage.States.Highlight
 local Target = ReplicatedStorage.States.Target
 local Hologram = ReplicatedStorage.States.Hologram
+local Marker = ReplicatedStorage.States.Marker
 
 --// Modules
-local tempData = require(Client.TempData)
+local ClientStates = require(Client.ClientStates)
 
 --// Module Functions
 MiscFunctions.restStep = function(max)
-	tempData.stepX, tempData.stepY = 0, 0
-	tempData.whatStepIsItOn = 1
-	tempData.stepSpacing = 1
-	tempData.stepLength = 1
-	tempData.stepDirection = 0
-	tempData.turnCounter = 1
-	tempData.maxSteps = max
+	ClientStates.stepX, ClientStates.stepY = 0, 0
+	ClientStates.whatStepIsItOn = 1
+	ClientStates.stepSpacing = 1
+	ClientStates.stepLength = 1
+	ClientStates.stepDirection = 0
+	ClientStates.turnCounter = 1
+	ClientStates.maxSteps = max
 end
 
 MiscFunctions.incrementStep = function()
 	local directionAdjustments = {
-		{ tempData.stepSpacing, 0 }, -- stepDirection 0: move right
-		{ 0, -tempData.stepSpacing }, -- stepDirection 1: move up
-		{ -tempData.stepSpacing, 0 }, -- stepDirection 2: move left
-		{ 0, tempData.stepSpacing }, -- stepDirection 3: move down
+		{ ClientStates.stepSpacing, 0 }, -- stepDirection 0: move right
+		{ 0, -ClientStates.stepSpacing }, -- stepDirection 1: move up
+		{ -ClientStates.stepSpacing, 0 }, -- stepDirection 2: move left
+		{ 0, ClientStates.stepSpacing }, -- stepDirection 3: move down
 	}
 
-	tempData.stepX += directionAdjustments[tempData.stepDirection + 1][1]
-	tempData.stepY += directionAdjustments[tempData.stepDirection + 1][2]
+	ClientStates.stepX += directionAdjustments[ClientStates.stepDirection + 1][1]
+	ClientStates.stepY += directionAdjustments[ClientStates.stepDirection + 1][2]
 
-	if tempData.whatStepIsItOn % tempData.stepLength == 0 then
-		tempData.stepDirection = (tempData.stepDirection + 1) % 4
-		tempData.turnCounter += 1
-		if tempData.turnCounter % 2 == 0 then
-			tempData.stepLength += 1
+	if ClientStates.whatStepIsItOn % ClientStates.stepLength == 0 then
+		ClientStates.stepDirection = (ClientStates.stepDirection + 1) % 4
+		ClientStates.turnCounter += 1
+		if ClientStates.turnCounter % 2 == 0 then
+			ClientStates.stepLength += 1
 		end
 	end
-	tempData.whatStepIsItOn += 1
+	ClientStates.whatStepIsItOn += 1
 end
 
 MiscFunctions.removeObject = function(object)
@@ -60,7 +61,7 @@ end
 
 MiscFunctions.removeObjects = function()
 	Highlight.Value = MiscFunctions.removeObject(Highlight.Value)
-	tempData.marker = MiscFunctions.removeObject(tempData.marker)
+	Marker.Value = MiscFunctions.removeObject(Marker.Value)
 	Hologram.Value = MiscFunctions.removeObject(Hologram.Value)
 end
 
@@ -77,12 +78,13 @@ MiscFunctions.unselect = function()
 		if Target.Value:FindFirstChild("Underlay") then
 			Target.Value.Underlay.Color = Color3.fromRGB(255, 29, 33)
 		end
-		if tempData.selceted then
-			tempData.selceted:Disconnect()
+		if ClientStates.selceted then
+			ClientStates.selceted:Disconnect()
 		end
 		botGui.Enabled = false
 		-- Clear all relevant variables at once
-		Target.Value, tempData.HealingTeamate, tempData.partStart, tempData.placeingWall = false, false, false, false
+		Target.Value, ClientStates.HealingTeamate, ClientStates.partStart, ClientStates.placeingWall =
+			nil, nil, nil, nil
 	end
 	MiscFunctions.removeObjects()
 end
@@ -107,14 +109,14 @@ MiscFunctions.MouseIsInregion = function()
 	local pos = mouse.Hit.Position -- Get updated mouse position
 	-- Get the min and max corners of the region
 	local minCorner = Vector3.new(
-		math.min(tempData.region[1].X, tempData.region[2].X),
-		math.min(tempData.region[1].Y, tempData.region[2].Y),
-		math.min(tempData.region[1].Z, tempData.region[2].Z)
+		math.min(ClientStates.region[1].X, ClientStates.region[2].X),
+		math.min(ClientStates.region[1].Y, ClientStates.region[2].Y),
+		math.min(ClientStates.region[1].Z, ClientStates.region[2].Z)
 	)
 	local maxCorner = Vector3.new(
-		math.max(tempData.region[1].X, tempData.region[2].X),
-		math.max(tempData.region[1].Y, tempData.region[2].Y),
-		math.max(tempData.region[1].Z, tempData.region[2].Z)
+		math.max(ClientStates.region[1].X, ClientStates.region[2].X),
+		math.max(ClientStates.region[1].Y, ClientStates.region[2].Y),
+		math.max(ClientStates.region[1].Z, ClientStates.region[2].Z)
 	)
 	-- Check if the position is inside the region
 	if
@@ -131,8 +133,8 @@ MiscFunctions.MouseIsInregion = function()
 	end
 end
 
-MiscFunctions.ifNot = function()
-	return not tempData.HealingTeamate and not tempData.placeingWall
+MiscFunctions.SoldierNotDoingAnything = function()
+	return not ClientStates.HealingTeamate and not ClientStates.placeingWall
 end
 
 return MiscFunctions

@@ -1,4 +1,4 @@
-local TempData = {
+return {
 	["stepY"] = 0,
 	["stepX"] = 0,
 	["stepLength"] = 1,
@@ -7,21 +7,13 @@ local TempData = {
 	["stepDirection"] = 0,
 	["whatStepIsItOn"] = 1,
 	["maxSteps"] = 50,
-	["soldierRange"] = nil,
 	["selceted"] = nil,
-	["hologram"] = nil,
 	["raycastParams"] = nil,
 	["newposition"] = nil,
-	["marker"] = nil,
-	["start"] = nil,
 	["HealingTeamate"] = nil,
 	["placeingWall"] = nil,
-	["Target"] = nil,
 	["region"] = {
 		Vector3.new(456, 66, 548) / 2,
 		-Vector3.new(456, 66, 548) / 2,
 	},
-	erroFlash = false,
 }
-
-return TempData

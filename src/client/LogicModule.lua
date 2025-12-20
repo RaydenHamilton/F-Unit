@@ -1,4 +1,3 @@
---!nocheck
 local LogicModule = {}
 
 --// Services
@@ -12,31 +11,12 @@ local mouse = player:GetMouse()
 local Target = ReplicatedStorage.States.Target
 
 --// Modules
-local tempData = require(client.TempData)
+local ClientStates = require(client.ClientStates)
 local miscFunctions = require(client.MiscFunctions)
 local createEffects = require(client.CreateEffects)
 -- local createInstances = require(script.Parent.CreateInstances)
 
 --// Module Functions
-LogicModule.canWalkTo = function(input)
-	if
-		input.UserInputType == Enum.UserInputType.MouseMovement
-		and Target.Value
-		and Target.Value:FindFirstChild("Underlay")
-	then
-		if tempData.whatStepIsItOn > tempData.maxSteps then
-			miscFunctions.restStep(50)
-		end
-		local position = mouse.Hit.Position + Vector3.new(tempData.stepX, 0, tempData.stepY)
-		tempData.newposition = LogicModule.createwalkpart(position)
-		if tempData.newposition then
-			createEffects.makeHologram(tempData.newposition)
-			miscFunctions.restStep(50)
-		else
-			miscFunctions.incrementStep()
-		end
-	end
-end
 
 LogicModule.createwalkpart = function(position)
 	local path = game:GetService("PathfindingService")
@@ -52,6 +32,22 @@ LogicModule.createwalkpart = function(position)
 	else
 		miscFunctions.removeObjects()
 		return false
+	end
+end
+
+LogicModule.SetHologram = function()
+	if Target.Value and Target.Value:FindFirstChild("Underlay") then
+		if ClientStates.whatStepIsItOn > ClientStates.maxSteps then
+			miscFunctions.restStep(50)
+		end
+		local position = mouse.Hit.Position + Vector3.new(ClientStates.stepX, 0, ClientStates.stepY)
+		ClientStates.newposition = LogicModule.createwalkpart(position)
+		if ClientStates.newposition then
+			createEffects.makeHologram(ClientStates.newposition)
+			miscFunctions.restStep(50)
+		else
+			miscFunctions.incrementStep()
+		end
 	end
 end
 
