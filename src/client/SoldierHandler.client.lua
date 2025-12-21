@@ -56,7 +56,7 @@ local function changeSoldier()
 	local raycastResult = getMouseRaycastTarget()
 	local target = raycastResult and raycastResult.Instance
 	player.PlayerGui.ShopUI.Enabled = false
-	local owner = target.Parent:GetAttribute("Owner")
+	local owner = target and target.Parent:GetAttribute("Owner")
 	if target and owner == player.UserId then
 		Target.Value = target.Parent
 
@@ -74,8 +74,12 @@ local function changeSoldier()
 		ShotRules.FilterType = Enum.RaycastFilterType.Exclude
 		ShotRules.IgnoreWater = true
 
+		local frameCounter = 0
 		ClientStates.selceted = RunService.RenderStepped:Connect(function()
-			createEffects.ShowRange(Target.Value, Target.Value:GetAttribute("Range"))
+			frameCounter += 1
+			if frameCounter % 3 == 0 then
+				createEffects.ShowRange(Target.Value, Target.Value:GetAttribute("Range"), 3)
+			end
 		end)
 	end
 end

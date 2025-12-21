@@ -46,7 +46,7 @@ EventModule.placeWall = function()
 	local Walls = Target.Value:GetAttribute("Walls")
 	if not Marker.Value then
 		MiscFunctions.removeObjects()
-		Marker.Value = createInstances.setUpMarker(mouse)
+		createInstances.setUpMarker(mouse)
 		while ClientStates.placeingWall and task.wait() and Marker.Value do
 			Marker.Value.Position = mouse.Hit.Position + Vector3.new(0, Marker.Value.Size.Y / 2, 0)
 			if not MiscFunctions.MouseIsInregion() then
@@ -55,17 +55,16 @@ EventModule.placeWall = function()
 				Marker.Value.Color = Color3.new(0, 0, 1)
 			end
 		end
-	end
-	if Marker.Value and not MiscFunctions.MouseIsInregion() then
+	elseif not MiscFunctions.MouseIsInregion() then
 		MiscFunctions.unselect()
-	elseif Marker.Value then
+	else
 		if ClientStates.partStart then
 			local size = math.round((Marker.Value.Size.Z / sandbag.Size.Z) / 0.6)
 			local partEnd = mouse.Hit.Position
-			if Marker.Color == Color3.new(0, 0, 1) then
+			if Marker.Value.Color == Color3.new(0, 0, 1) then
 				placeObject:FireServer(
 					size,
-					ClientStates.partStart - Vector3.new(0, Marker.Size.Y / 2, 0),
+					ClientStates.partStart - Vector3.new(0, Marker.Value.Size.Y / 2, 0),
 					partEnd,
 					Target.Value
 				)
@@ -73,7 +72,7 @@ EventModule.placeWall = function()
 			MiscFunctions.unselect()
 			return
 		end
-		local text = createInstances.makeBillboardGui(Marker.Value)
+		local text = createInstances.makeBillboardGui()
 		ClientStates.partStart = mouse.Hit.Position + Vector3.new(0, Marker.Value.Size.Y / 2, 0)
 		while task.wait() and Marker.Value do
 			if ClientStates.partStart then

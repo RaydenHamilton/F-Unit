@@ -5,6 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 local TweenService = game:GetService("TweenService")
+local RunService = game:GetService("RunService")
 
 --// Variables
 local player = Players.LocalPlayer
@@ -12,13 +13,14 @@ local mouse = player:GetMouse()
 local Highlight = ReplicatedStorage.States.Highlight
 local Target = ReplicatedStorage.States.Target
 local Hologram = ReplicatedStorage.States.Hologram
+
 --// Modules
 local ClientStates = require(script.Parent.ClientStates)
 local MiscFunctions = require(script.Parent.MiscFunctions)
 local createInstances = require(script.Parent.CreateInstances)
 
 --// Module Functions
-CreateEffects.ShowRange = function(target, soldierRange)
+CreateEffects.ShowRange = function(target, soldierRange, frameCounter)
 	local rootPart = target.PrimaryPart
 	local numRays = 200 -- Number of rays in the circle
 	local last
@@ -49,6 +51,9 @@ CreateEffects.ShowRange = function(target, soldierRange)
 		end
 
 		task.delay(0, function()
+			for _ = 1, frameCounter do
+				RunService.RenderStepped:Wait()
+			end
 			attachment:Destroy()
 		end)
 

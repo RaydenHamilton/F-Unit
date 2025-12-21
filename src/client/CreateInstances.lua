@@ -7,17 +7,18 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 --// Variables
 local highlight = ReplicatedStorage.States.Highlight
+local Marker = ReplicatedStorage.States.Marker
 
-CreatePart.makeBillboardGui = function(marker)
+CreatePart.makeBillboardGui = function()
 	local gui = Instance.new("BillboardGui")
-	gui.Parent = marker
+	gui.Parent = Marker.Value
 	gui.Size = UDim2.fromScale(5, 5)
 	gui.AlwaysOnTop = true
 	gui.ClipsDescendants = false
 	gui.StudsOffset = Vector3.new(0, 4, 0)
 
 	local text = Instance.new("TextLabel")
-	text.Parentr = gui
+	text.Parent = gui
 	text.Size = UDim2.fromScale(1, 1)
 	text.BackgroundTransparency = 1
 	text.Text = "0"
@@ -35,7 +36,7 @@ CreatePart.setUpMarker = function(mouse)
 	marker.CanCollide = false
 	marker.Material = Enum.Material.SmoothPlastic
 	mouse.TargetFilter = marker
-	return marker
+	Marker.Value = marker
 end
 
 CreatePart.SetHighlight = function(
