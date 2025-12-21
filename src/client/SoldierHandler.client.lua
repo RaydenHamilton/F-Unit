@@ -57,7 +57,7 @@ local function changeSoldier()
 	local target = raycastResult and raycastResult.Instance
 	player.PlayerGui.ShopUI.Enabled = false
 	local owner = target.Parent:GetAttribute("Owner")
-	if target and owner and owner == player.UserId then
+	if target and owner == player.UserId then
 		Target.Value = target.Parent
 
 		local Walls = Target.Value:GetAttribute("Walls")

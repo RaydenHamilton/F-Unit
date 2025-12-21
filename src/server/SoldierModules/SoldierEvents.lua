@@ -9,7 +9,7 @@ local ServerStorage = game:GetService("ServerStorage")
 --// Modules
 local soldierAnimation = require(script.Parent.soldierAnimationController)
 local SoldierPathFinding = require(script.Parent.SoldierPathFinding)
-local SoldierClass = require(game.ServerStorage.SoldierClass)
+local SoldierClass = require(ServerStorage.SoldierClass)
 
 --// Types
 type SoldierData = SoldierClass.SoldierData
@@ -187,7 +187,7 @@ function SoldierEvents.SetPose(_, pose, npc, soldierData)
 	if npc ~= soldierData.Soldier then
 		return
 	end
-	soldierData.pose = pose
+	soldierData.Soldier:SetAttribute("Pose", pose)
 
 	local spos: Vector3 = soldierData.HumanoidRootPart.Position
 	task.wait(0.1)

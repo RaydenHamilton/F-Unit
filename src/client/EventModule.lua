@@ -1,5 +1,3 @@
---!nocheck
-
 local EventModule = {}
 
 --// Services
@@ -32,15 +30,15 @@ local botGui = player:WaitForChild("PlayerGui"):WaitForChild("Main")
 
 --// Module Functions
 EventModule.crawl = function()
-	setPose:FireServer("crawl", Target.Value)
+	setPose:FireServer("Crawl", Target.Value)
 end
 
 EventModule.crouch = function()
-	setPose:FireServer("crouch", Target.Value)
+	setPose:FireServer("Crouch", Target.Value)
 end
 
 EventModule.stand = function()
-	setPose:FireServer("stand", Target.Value)
+	setPose:FireServer("Stand", Target.Value)
 end
 
 EventModule.placeWall = function()

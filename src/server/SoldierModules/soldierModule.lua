@@ -3,6 +3,7 @@
 local RunService = game:GetService("RunService")
 local PathfindingService = game:GetService("PathfindingService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local ServerStorage = game:GetService("ServerStorage")
 
 --// Modules
 local soldierAnimation = require(script.Parent.soldierAnimationController)
@@ -10,12 +11,12 @@ local soldierEffects = require(script.Parent.soldierEffects)
 local SoldierEvents = require(script.Parent.SoldierEvents)
 local nameModule = require(script.Parent.NameModule)
 local deathModule = require(script.Parent.DeathModule)
-local SoldierClass = require(game.ServerStorage.SoldierClass)
+local SoldierClass = require(ServerStorage.SoldierClass)
 
 --// Type Declarations
 type SoldierData = SoldierClass.SoldierData
 
---// Models or Folders
+--// Local Events
 local NPCEvents = ReplicatedStorage.NPCEvents
 
 --// Main Module

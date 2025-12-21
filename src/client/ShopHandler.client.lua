@@ -1,14 +1,17 @@
---!nocheck
-
 --// Services
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local StarterGui = game:GetService("StarterGui")
 
---// Varubles
+--// Variables
 local player = Players.LocalPlayer
+--// Move StarterGui to PlayerGui
+for _, GuiElement in pairs(StarterGui:GetChildren()) do
+	GuiElement:Clone().Parent = player.PlayerGui
+end
 local tabs = player.PlayerGui:WaitForChild("ShopUI")
 local options = tabs.Options
-local GetPlayerMoney = 100
+local playerMoney = 0
 local points = player.PlayerGui.HudUI.Points.MPNumber
 local highlight = ReplicatedStorage.States.Highlight
 
@@ -30,15 +33,15 @@ local function LoadButtons(tabName, classes)
 		button.Parent = newTab
 		button.Visible = true
 		button.Activated:Connect(function()
-			if GetPlayerMoney >= classInfo.Cost then
+			if playerMoney >= classInfo.Cost then
 				local success = ReplicatedStorage.Remotes.RemoteFunctions.SpawnInit:InvokeServer(
 					tabName,
 					className,
-					highlight.Value.Parent
+					highlight.Value and highlight.Value.Parent or nil
 				)
 				if success then
-					GetPlayerMoney = GetPlayerMoney - classInfo.Cost
-					points.Text = GetPlayerMoney
+					playerMoney = playerMoney - classInfo.Cost
+					points.Text = playerMoney
 					button.Parent.Visible = false
 					options.Visible = true
 					tabs.Enabled = false
@@ -55,9 +58,9 @@ local function LoadItems()
 	LoadButtons("Weapons", WeaponClasses)
 	LoadButtons("Vehicles", VehicleClasses)
 	local template = tabs.TabTemplate
-	template:Destroy()
+	template.Visible = false
 	local itemTemplate = tabs.ItemTemplate
-	itemTemplate:Destroy()
+	itemTemplate.Visible = false
 end
 
 local function BacktoOptions(option)
@@ -78,9 +81,6 @@ local function OpenOptions(button)
 	end)
 end
 
---// Initial
-LoadItems()
-
 --// Connections
 for _, option in pairs(options:GetChildren()) do
 	if option:IsA("TextButton") then
@@ -92,9 +92,12 @@ end
 
 --// sould be in another scripts
 local function UpdateMoney(money)
-	GetPlayerMoney = money
-	points.Text = GetPlayerMoney
+	playerMoney = money
+	points.Text = playerMoney
 end
 
 --// Events
 ReplicatedStorage.NPCEvents.TellClientMoney.OnClientEvent:Connect(UpdateMoney)
+
+--// Initial
+LoadItems()
