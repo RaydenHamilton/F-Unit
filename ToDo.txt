@@ -41,3 +41,42 @@ Later Types:
     flamethrower: 75 mp
     officer: 200 mp
 
+Settings for proformance:
+    turn of show range:
+    eddit the update rate of things like under lay
+
+RNG:
+    hidden extra money or items that you can find in the map
+
+-- think of clash royal
+Progresstion:
+    Skill Tree:
+        unlock more expensive units with better stats like war thunder
+        unlock different types of things like other types of tankss but equal to the things you already have 
+        like a troop transport that can hold more but is slower type thing
+    skins or Troop Colors:
+        things like black neon or just different outfits or cloths
+    base/building skins:
+
+    death animations:
+
+    gun skins? maybe:
+
+    News Maps:
+        -city
+        -forest
+        -farm
+        -etc
+    challanges:
+        get this many kills with this units
+        badges to unlock extra things
+        unit leveling for things like COD.
+        Daily challanges or shop
+        malty level challanges to unlock things 
+        reputation
+    
+
+    Matches played counter:
+
+-alow for custiom matches
+-add fog of war

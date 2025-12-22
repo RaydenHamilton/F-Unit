@@ -1,7 +1,0 @@
-- Make squad placing system
-scripts: 
-    - shop handler
-    - squad classes
-    i think thats it
-
-Rename gui parts to be getter and make gui more better later
