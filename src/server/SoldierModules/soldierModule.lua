@@ -38,30 +38,37 @@ local SoldierModule = {
 local AllSoldiers = {}
 
 --// Local Functions
+local function DamageSandBags(hit, soldierData: SoldierData)
+	hit.Parent.Value.Value -= soldierData.Class.Damage
+	local model = hit.Parent
+	while soldierData.Class.Damage * #model:GetChildren() > model.Value.Value and model do
+		local highest: MeshPart?
+		for _, v in pairs(model:GetChildren()) do
+			if v:IsA("MeshPart") and (not highest or v.Position.Y > highest.Position.Y) then
+				highest = v
+			end
+		end
+		if highest then
+			highest:Destroy()
+			highest = nil
+		end
+	end
+	if model.Value.Value < 1 then
+		hit.Parent.Parent:Destroy()
+	end
+end
+
 local function DealDamage(hit: BasePart | any, soldierData: SoldierData)
-	if not hit or hit:IsA("BasePart") then
+	if not hit then
 		return
 	end
-	if hit.Name ~= "HumanoidRootPart" and hit.Parent:findFirstChildOfClass("Humanoid") ~= nil then
-		hit.Parent.Humanoid:TakeDamage(soldierData.Class.Damage)
+	local Humanoid = hit.Parent:FindFirstChild("Humanoid")
+	--// hit player
+	if hit.Name ~= "HumanoidRootPart" and Humanoid then
+		Humanoid:TakeDamage(soldierData.Class.Damage)
+	--// hit sand bag
 	elseif hit.Name == "Sandbag" then
-		hit.Parent.Value.Value -= soldierData.Class.Damage
-		local model = hit.Parent
-		while soldierData.Class.Damage * #model:GetChildren() > model.Value.Value and model do
-			local highest: MeshPart?
-			for i, v in pairs(model:GetChildren()) do
-				if v:IsA("MeshPart") and (not highest or v.Position.Y > highest.Position.Y) then
-					highest = v
-				end
-			end
-			if highest then
-				highest:Destroy()
-				highest = nil
-			end
-		end
-		if model.Value.Value < 1 then
-			hit.Parent.Parent:Destroy()
-		end
+		DamageSandBags(hit, soldierData)
 	end
 end
 
