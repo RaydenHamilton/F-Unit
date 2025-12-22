@@ -76,7 +76,7 @@ SpawnInit.OnServerInvoke = function(player, tabName: string, className: string, 
 			if tabName == "Soldiers" then
 				buySoldier(player, { className }, spawn)
 			elseif tabName == "Squads" then
-				buySoldier(player, className, spawn)
+				buySoldier(player, classInfo.Units, spawn)
 			end
 			return true
 		end

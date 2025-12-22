@@ -130,7 +130,7 @@ CreateEffects.highlightCharacter = function(input)
 			return
 		end
 		local hoverOver = mouse.Target.Parent
-		if hoverOver and hoverOver:GetTags()[1] and hoverOver.Parent then
+		if hoverOver and hoverOver.Parent then
 			local owner = hoverOver:GetAttribute("Owner")
 			if not owner then
 				return
@@ -143,7 +143,7 @@ CreateEffects.highlightCharacter = function(input)
 		elseif
 			hoverOver
 			and hoverOver.Name == "Door Closed"
-			and tonumber(hoverOver.Parent:GetTags()[1]) ~= player.UserId
+			and hoverOver.Parent:GetAttribute("Owner") ~= player.UserId
 		then
 			createInstances.SetHighlight(hoverOver, false, Color3.new(0, 0, 0), true)
 			Hologram.Value = MiscFunctions.removeObject(Hologram.Value)
@@ -154,7 +154,7 @@ CreateEffects.highlightCharacter = function(input)
 		mouse.Target
 		and mouse.Target.Parent
 		and mouse.Target.Parent.Parent.Name == "Spawn"
-		and tonumber(mouse.Target.Parent.Parent.Parent:GetTags()[1]) == player.UserId
+		and mouse.Target.Parent.Parent.Parent:GetAttribute("Owner") == player.UserId
 		and not mouse.Target.Parent.Parent:FindFirstChildOfClass("Highlight")
 	then
 		createInstances.SetHighlight(mouse.Target.Parent.Parent, false, Color3.new(0, 0, 0), true)

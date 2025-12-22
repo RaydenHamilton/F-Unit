@@ -1,7 +1,7 @@
 --!nocheck
 --// Services
 local Players = game:GetService("Players")
-
+local Workspace = game:GetService("Workspace")
 --// Local Functions
 local function playAimation(character)
 	local humanoid = character:WaitForChild("Humanoid")
@@ -16,25 +16,20 @@ local function playAimation(character)
 end
 
 local function PlayerTeam(player)
+	local char = Players:CreateHumanoidModelFromUserId(player.UserId) or nil
+	local bunker
 	if player.Team.Name == "TeamOne" then
-		local char = game:WaitForChild("Players"):CreateHumanoidModelFromUserId(player.UserId)
-		for _, part in pairs(char:GetChildren()) do
-			if not part:IsA("BasePart") and part.Name ~= char.Humanoid.Name then
-				local leader = workspace.Map.bunkerOne.leader
-				part.Parent = leader
-				playAimation(leader)
-				workspace.Map.bunkerOne:AddTag(player.UserId)
-			end
-		end
+		bunker = Workspace.Map.bunkerOne
 	elseif player.Team.Name == "TeamTwo" then
-		local char = game:WaitForChild("Players"):CreateHumanoidModelFromUserId(player.UserId)
-		for _, part in pairs(char:GetChildren()) do
-			if not part:IsA("BasePart") and part.Name ~= char.Humanoid.Name then
-				local leader = workspace.Map.bunkerTwo.leader
-				part.Parent = leader
-				playAimation(leader)
-				workspace.Map.bunkerTwo:AddTag(player.UserId)
-			end
+		bunker = Workspace.Map.bunkerTwo
+	end
+
+	local leader = bunker.leader
+	bunker:SetAttribute("Owner", player.UserId)
+	for _, part in pairs(char:GetChildren()) do
+		if not part:IsA("BasePart") and part.Name ~= "Humanoid" then
+			part.Parent = leader
+			playAimation(leader)
 		end
 	end
 end

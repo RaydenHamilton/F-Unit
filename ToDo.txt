@@ -21,7 +21,6 @@ TODO:
         machanized snlf: 450 mp
         combat engineer: 150 mp
         mine disosal: 50 mp
-        combat engineer: 200 mp
 
     single solder buttons:
     

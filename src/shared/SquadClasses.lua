@@ -1,39 +1,61 @@
-local class = {}
-
-class.Riflesquad = {
-	["Cost"] = 100,
-	["MaxSoldiers"] = 4,
-	["SoldierType"] = "Rifle",
+return {
+	recruits = {
+		["Cost"] = 50,
+		["Units"] = {
+			"Rifle",
+		},
+	},
+	assaultInfantry = {
+		["Cost"] = 50,
+		["Units"] = {
+			"Rifle",
+		},
+	},
+	regularInfantry = {
+		["Cost"] = 50,
+		["Units"] = {
+			"Rifle",
+			"Rifle",
+			"Rifle",
+			"Rifle",
+		},
+	},
+	paratroopers = {
+		["Cost"] = 50,
+		["Units"] = {
+			"Rifle",
+			"Rifle",
+			"Rifle",
+			"Rifle",
+			"Rifle",
+			"Rifle",
+			"Rifle",
+		},
+	},
+	SNLF = {
+		["Cost"] = 50,
+		["Units"] = {
+			"Rifle",
+			"Rifle",
+			"Rifle",
+		},
+	},
+	machanizedSNLF = {
+		["Cost"] = 50,
+		["Units"] = {
+			"Rifle",
+		},
+	},
+	combatEngineer = {
+		["Cost"] = 50,
+		["Units"] = {
+			"Rifle",
+		},
+	},
+	mineDisposal = {
+		["Cost"] = 50,
+		["Units"] = {
+			"Rifle",
+		},
+	},
 }
-class.Snipersquad = {
-	["Cost"] = 150,
-	["MaxSoldiers"] = 2,
-	["SoldierType"] = "Sniper",
-}
-class.LMGsquad = {
-	["Cost"] = 125,
-	["MaxSoldiers"] = 3,
-	["SoldierType"] = "LMG",
-}
-class.Shotgunsquad = {
-	["Cost"] = 120,
-	["MaxSoldiers"] = 3,
-	["SoldierType"] = "Shotgun",
-}
-class.TankSquad = {
-	["Cost"] = 300,
-	["MaxSoldiers"] = 1,
-	["SoldierType"] = "tankoperator",
-}
-class.MixedSquad = {
-	["Cost"] = 200,
-	["MaxSoldiers"] = 5,
-	["SoldierType"] = "Mixed",
-}
-class.EmptySquad = {
-	["Cost"] = 0,
-	["MaxSoldiers"] = 0,
-	["SoldierType"] = "None",
-}
-
-return class
