@@ -13,11 +13,10 @@ local function adminPFpic()
 end
 
 local function player(friends: Player)
-	local players = game:GetService("Players")
 	local PlayersFriends = {}
 
 	local success, page = pcall(function()
-		return players:GetFriendsAsync(friends.UserId)
+		return Players:GetFriendsAsync(friends.UserId)
 	end)
 
 	if success then

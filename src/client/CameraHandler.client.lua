@@ -1,13 +1,11 @@
---!nocheck
-
-if not game:IsLoaded() then
-	game.Loaded:Wait()
-end
-
 --// Services
 local UserInputService = game:GetService("UserInputService")
 local RunService = game:GetService("RunService")
 local Workspace = game:GetService("Workspace")
+
+if not game:IsLoaded() then
+	game.Loaded:Wait()
+end
 
 --// Variables
 local cam = workspace.CurrentCamera

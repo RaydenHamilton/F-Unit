@@ -1,12 +1,6 @@
 --!strict
 --// Services
-local ServerStorage = game:GetService("ServerStorage")
-
---// Modules
-local SoldierClass = require(ServerStorage.SoldierClass)
-
---// Types
-type SoldierData = SoldierClass.SoldierData
+local ContentProvider = game:GetService("ContentProvider")
 
 --// Module
 local soldierAnimation = {
@@ -28,12 +22,17 @@ local soldierAnimation = {
 		Hammering = "rbxassetid://81967592746511",
 	},
 }
+soldierAnimation.__index = soldierAnimation
+function soldierAnimation.new(soldier) 
+	local self = setmetatable({},soldierAnimation)
+	self.Soldier = soldier
+	return self
+end
 
 --// Module Functions
-soldierAnimation.LoadAnimation = function(humaniod: Humanoid): {}
+function soldierAnimation:LoadAnimation (humaniod: Humanoid): {}
 	local animator = humaniod:WaitForChild("Animator") :: Animator
 
-	local CP = game:GetService("ContentProvider")
 	local anim = {
 		-- standing
 		soldierAnimation.Animation["IdleStanding"], --1 idle
@@ -65,11 +64,11 @@ soldierAnimation.LoadAnimation = function(humaniod: Humanoid): {}
 		end
 		table.insert(loaded, AnimationTrack)
 	end
-	CP:PreloadAsync(loaded)
+	ContentProvider:PreloadAsync(loaded)
 	return loaded
 end
 
-soldierAnimation.PlayAnim = function(number, NPChumanoid, loaded)
+function soldierAnimation:PlayAnim (number, NPChumanoid, loaded)
 	for i, v in pairs(NPChumanoid:GetPlayingAnimationTracks()) do
 		if v.Name ~= loaded[number].Name then
 			v:Stop()
@@ -81,48 +80,48 @@ soldierAnimation.PlayAnim = function(number, NPChumanoid, loaded)
 	return loaded[number]
 end
 
-soldierAnimation.SetState = function(Speed: number, soldierData: SoldierData)
-	local rightShoulder = soldierData.Soldier:WaitForChild("Torso"):WaitForChild("Right Shoulder") :: Motor6D
-	local leftShoulder = soldierData.Soldier:WaitForChild("Torso"):WaitForChild("Left Shoulder") :: Motor6D
+function soldierAnimation:SetState(Speed: number, self.Soldier: self.Soldier)
+	local rightShoulder = self.Soldier.Character:WaitForChild("Torso"):WaitForChild("Right Shoulder") :: Motor6D
+	local leftShoulder = self.Soldier.Character:WaitForChild("Torso"):WaitForChild("Left Shoulder") :: Motor6D
 
 	local LiveSpeed = Speed
 	local timeStart = tick()
 
-	soldierData.StateQueue[#soldierData.StateQueue + 1] = LiveSpeed
+	self.Soldier.StateQueue[#self.Soldier.StateQueue + 1] = LiveSpeed
 	repeat
 		task.wait()
-	until (soldierData.StateQueue[#soldierData.StateQueue] == LiveSpeed and tick() * 10 > math.ceil(timeStart * 10))
+	until (self.Soldier.StateQueue[#self.Soldier.StateQueue] == LiveSpeed and tick() * 10 > math.ceil(timeStart * 10))
 		or tick() - timeStart > 3
 	if tick() - timeStart > 2 then
 		return
 	end
-	rightShoulder.C1 = soldierData.RightShoulder
-	leftShoulder.C1 = soldierData.LeftShoulder
+	rightShoulder.C1 = self.Soldier.RightShoulder
+	leftShoulder.C1 = self.Soldier.LeftShoulder
 
 	local state = 0
-	local humanoid: Humanoid = soldierData.Humanoid
+	local humanoid: Humanoid = self.Soldier.Humanoid
 
-	if soldierData.Soldier:GetAttribute("Pose") == "Stand" then
+	if self.Soldier.Character:GetAttribute("Pose") == "Stand" then
 		state += 0
 		humanoid.WalkSpeed = 16
-	elseif soldierData.Soldier:GetAttribute("Pose") == "Crawl" then
+	elseif self.Soldier.Character:GetAttribute("Pose") == "Crawl" then
 		state += 6
 		humanoid.WalkSpeed = 4
-	elseif soldierData.Soldier:GetAttribute("Pose") == "Crouch" then
+	elseif self.Soldier.Character:GetAttribute("Pose") == "Crouch" then
 		state += 3
 		humanoid.WalkSpeed = 5
 	end
 
-	if soldierData.StateQueue[#soldierData.StateQueue] == 0 then
-		if soldierData.Soldier:GetAttribute("Covering") then
+	if self.Soldier.StateQueue[#self.Soldier.StateQueue] == 0 then
+		if self.Soldier.Character:GetAttribute("Covering") then
 			state = 10 -- hiding
 		elseif
-			soldierData.Soldier:GetAttribute("Building")
-			or soldierData.Soldier:GetAttribute("Healing")
-			or soldierData.Soldier:GetAttribute("PlantingBomb")
+			self.Soldier.Character:GetAttribute("Building")
+			or self.Soldier.Character:GetAttribute("Healing")
+			or self.Soldier.Character:GetAttribute("PlantingBomb")
 		then
 			state = 12 -- building
-		elseif soldierData.ClosesEnemy then
+		elseif self.Soldier.ClosesEnemy then
 			state += 2 -- targeting
 		else
 			state += 1 -- idle
@@ -131,30 +130,30 @@ soldierAnimation.SetState = function(Speed: number, soldierData: SoldierData)
 		state += 3 -- running
 	end
 
-	soldierData.State = soldierAnimation.PlayAnim(state, soldierData.Humanoid, soldierData.Loaded)
+	self.Soldier.State = soldierAnimation:PlayAnim(state, self.Soldier.Humanoid, self.Soldier.Loaded)
 
-	if soldierData.StateQueue[#soldierData.StateQueue] == Speed then
-		table.clear(soldierData.StateQueue)
-		soldierData.LaststateChange = tick()
+	if self.Soldier.StateQueue[#self.Soldier.StateQueue] == Speed then
+		table.clear(self.Soldier.StateQueue)
+		self.Soldier.LaststateChange = tick()
 	end
 end
 
-soldierAnimation.isRunning = function(soldierData: SoldierData): boolean
-	return soldierData.State.Name == soldierAnimation.Animation["RunningCrawling"]
-		or soldierData.State.Name == soldierAnimation.Animation["RunningStanding"]
-		or soldierData.State.Name == soldierAnimation.Animation["RunningCrouching"]
+function soldierAnimation:isRunning(): boolean
+	return self.Soldier.State.Name == soldierAnimation.Animation["RunningCrawling"]
+		or self.Soldier.State.Name == soldierAnimation.Animation["RunningStanding"]
+		or self.Soldier.State.Name == soldierAnimation.Animation["RunningCrouching"]
 end
 
-soldierAnimation.isFiring = function(soldierData: SoldierData): boolean
-	return soldierData.State.Name == soldierAnimation.Animation["FiringCrawling"]
-		or soldierData.State.Name == soldierAnimation.Animation["FiringStanding"]
-		or soldierData.State.Name == soldierAnimation.Animation["FiringCrouching"]
+function soldierAnimation:isFiring(): boolean
+	return self.Soldier.State.Name == soldierAnimation.Animation["FiringCrawling"]
+		or self.Soldier.State.Name == soldierAnimation.Animation["FiringStanding"]
+		or self.Soldier.State.Name == soldierAnimation.Animation["FiringCrouching"]
 end
 
-soldierAnimation.isIdle = function(soldierData: SoldierData): boolean
-	return soldierData.State.Name == soldierAnimation.Animation["IdleCrawling"]
-		or soldierData.State.Name == soldierAnimation.Animation["IdleStanding"]
-		or soldierData.State.Name == soldierAnimation.Animation["IdleCrouching"]
+function soldierAnimation:isIdle() : boolean
+	return self.Soldier.State.Name == soldierAnimation.Animation["IdleCrawling"]
+		or self.Soldier.State.Name == soldierAnimation.Animation["IdleStanding"]
+		or self.Soldier.State.Name == soldierAnimation.Animation["IdleCrouching"]
 end
 
 return soldierAnimation

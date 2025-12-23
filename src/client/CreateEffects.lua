@@ -13,6 +13,7 @@ local mouse = player:GetMouse()
 local Highlight = ReplicatedStorage.States.Highlight
 local Target = ReplicatedStorage.States.Target
 local Hologram = ReplicatedStorage.States.Hologram
+local ClientStorage = {}
 
 --// Modules
 local ClientStates = require(script.Parent.ClientStates)
@@ -23,7 +24,7 @@ local createInstances = require(script.Parent.CreateInstances)
 CreateEffects.ShowRange = function(target, soldierRange, frameCounter)
 	local rootPart = target.PrimaryPart
 	local numRays = 200 -- Number of rays in the circle
-	local last
+	local lastAttachment
 	for i = 0, numRays do
 		local ShotRules = RaycastParams.new()
 		ShotRules.FilterDescendantsInstances = {
@@ -57,14 +58,14 @@ CreateEffects.ShowRange = function(target, soldierRange, frameCounter)
 			attachment:Destroy()
 		end)
 
-		if last then
+		if lastAttachment then
 			local beam = Instance.new("Beam")
 			beam.Parent = attachment
 			beam.Attachment0 = attachment
-			beam.Attachment1 = last
+			beam.Attachment1 = lastAttachment
 		end
 
-		last = attachment
+		lastAttachment = attachment
 	end
 end
 
@@ -101,7 +102,6 @@ end
 
 CreateEffects.animateUnderlay = function(input)
 	if input.UserInputType == Enum.UserInputType.MouseMovement then
-		local list = require(ReplicatedStorage.Shared.LocalClientStorage)
 		local char = mouse.Target and mouse.Target.Parent
 
 		if char and char:FindFirstChild("Underlay") then
@@ -109,16 +109,16 @@ CreateEffects.animateUnderlay = function(input)
 				char.Underlay.Color = Color3.fromRGB(88, 88, 88)
 			end
 			TweenService:Create(char.Underlay, TweenInfo.new(0.1), { Size = Vector3.new(4.5, 0.031, 4.5) }):Play()
-			table.insert(list, char.Underlay)
+			table.insert(ClientStorage, char.Underlay)
 		end
 
-		for i, underlay in pairs(list) do
+		for i, underlay in pairs(ClientStorage) do
 			if underlay.Size.X > 4 and mouse.Target and mouse.Target.Parent ~= underlay.Parent then
 				if underlay.Color == Color3.fromRGB(88, 88, 88) then
 					underlay.Color = Color3.fromRGB(255, 29, 33)
 				end
 				TweenService:Create(underlay, TweenInfo.new(0.1), { Size = Vector3.new(4, 0.031, 4) }):Play()
-				table.remove(list, i)
+				table.remove(ClientStorage, i)
 			end
 		end
 	end

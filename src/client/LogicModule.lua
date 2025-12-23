@@ -3,6 +3,7 @@ local LogicModule = {}
 --// Services
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local PathfindingService = game:GetService("PathfindingService")
 
 --// Variables
 local player = Players.LocalPlayer
@@ -19,12 +20,16 @@ local createEffects = require(client.CreateEffects)
 --// Module Functions
 
 LogicModule.createwalkpart = function(position)
-	local path = game:GetService("PathfindingService")
-		:CreatePath({ AgentCanJump = false, AgentRadius = 1.7, WaypointSpacing = 1, Costs = { Center = 0.1 } }) --
+	PathfindingService:CreatePath({
+		AgentCanJump = false,
+		AgentRadius = 1.7,
+		WaypointSpacing = 1,
+		Costs = { Center = 0.1 },
+	}) --
 	if (position - Target.Value["Underlay"].Position).magnitude < 999 then
-		path:ComputeAsync(Target.Value["Underlay"].Position, position)
-		local waypoints = path:GetWaypoints()
-		if path.Status == Enum.PathStatus.Success then
+		PathfindingService:ComputeAsync(Target.Value["Underlay"].Position, position)
+		local waypoints = PathfindingService:GetWaypoints()
+		if PathfindingService:GetWaypoints().Status == Enum.PathStatus.Success then
 			return waypoints[#waypoints].Position
 		else
 			return false
