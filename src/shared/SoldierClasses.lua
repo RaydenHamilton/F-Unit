@@ -43,7 +43,7 @@ return {
 		["Cost"] = 25,
 		["Bloom"] = 5,
 		["ClipSize"] = 6,
-		["Damage"] = 75,
+		["Damage"] = 60,
 		["FiringRate"] = 2.75,
 		["Range"] = 200,
 		["ReloadTime"] = 6,

@@ -31,7 +31,7 @@ CreateEffects.ShowRange = function(target, soldierRange, frameCounter)
 			target,
 			Workspace.Targets,
 			Workspace.ClientParts,
-			Workspace.walls,
+			Workspace.Walls,
 		}
 		ShotRules.FilterType = Enum.RaycastFilterType.Exclude
 		ShotRules.IgnoreWater = true

@@ -34,7 +34,7 @@ local function LoadButtons(tabName, classes)
 		button.Visible = true
 		button.Activated:Connect(function()
 			if playerMoney >= classInfo.Cost then
-				local success = ReplicatedStorage.Remotes.RemoteFunctions.SpawnInit:InvokeServer(
+				local success = ReplicatedStorage.Remotes.RemoteFunctions.SpawnUnit:InvokeServer(
 					tabName,
 					className,
 					highlight.Value and highlight.Value.Parent or nil

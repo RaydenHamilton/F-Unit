@@ -29,7 +29,8 @@ function DeathAnimations:PlayDeath()
 	self.Soldier.Humanoid.WalkSpeed = 0
 	self.Soldier.Humanoid.JumpPower = 0
 	--plays random sound
-	local Deathsound = Instance.new("Sound", character:WaitForChild("Head"))
+	local Deathsound = Instance.new("Sound")
+	Deathsound.Parent = character.Head
 	Deathsound.Volume = 1
 	local Deathsounds = {
 		"rbxassetid://6932519682",

@@ -18,20 +18,20 @@ local soldierAnimation = {
 		RunningCrawling = "rbxassetid://82403020038662",
 
 		Hiding = "rbxassetid://10381835217",
-		Reloading = "rbxassetid://10444669194",
+		Reloading = "rbxassetid://93988191304542",
 		Hammering = "rbxassetid://81967592746511",
 	},
 }
 soldierAnimation.__index = soldierAnimation
-function soldierAnimation.new(soldier) 
-	local self = setmetatable({},soldierAnimation)
+function soldierAnimation.new(soldier)
+	local self = setmetatable({}, soldierAnimation)
 	self.Soldier = soldier
 	return self
 end
 
 --// Module Functions
-function soldierAnimation:LoadAnimation (humaniod: Humanoid): {}
-	local animator = humaniod:WaitForChild("Animator") :: Animator
+function soldierAnimation:LoadAnimation()
+	local animator = self.Soldier.Humanoid:WaitForChild("Animator")
 
 	local anim = {
 		-- standing
@@ -61,6 +61,8 @@ function soldierAnimation:LoadAnimation (humaniod: Humanoid): {}
 		AnimationTrack.Name = v
 		if i ~= 11 then
 			AnimationTrack.Looped = true
+		else
+			AnimationTrack.Looped = false
 		end
 		table.insert(loaded, AnimationTrack)
 	end
@@ -68,21 +70,24 @@ function soldierAnimation:LoadAnimation (humaniod: Humanoid): {}
 	return loaded
 end
 
-function soldierAnimation:PlayAnim (number, NPChumanoid, loaded)
-	for i, v in pairs(NPChumanoid:GetPlayingAnimationTracks()) do
-		if v.Name ~= loaded[number].Name then
+function soldierAnimation:PlayAnim(number: number)
+	print(number, "play")
+	for _, v in pairs(self.Soldier.Humanoid:GetPlayingAnimationTracks()) do
+		if v.Name ~= self.Soldier.Loaded[number].Name then
 			v:Stop()
 		else
-			return loaded[number]
+			return self.Soldier.Loaded[number]
 		end
 	end
-	loaded[number]:Play()
-	return loaded[number]
+	self.Soldier.Loaded[number]:Play()
+	return self.Soldier.Loaded[number]
 end
 
-function soldierAnimation:SetState(Speed: number, self.Soldier: self.Soldier)
-	local rightShoulder = self.Soldier.Character:WaitForChild("Torso"):WaitForChild("Right Shoulder") :: Motor6D
-	local leftShoulder = self.Soldier.Character:WaitForChild("Torso"):WaitForChild("Left Shoulder") :: Motor6D
+function soldierAnimation:SetState(Speed: number)
+	print(Speed, "speed")
+	local character = self.Soldier.Character
+	local rightShoulder = character:WaitForChild("Torso"):WaitForChild("Right Shoulder") :: Motor6D
+	local leftShoulder = character:WaitForChild("Torso"):WaitForChild("Left Shoulder") :: Motor6D
 
 	local LiveSpeed = Speed
 	local timeStart = tick()
@@ -90,8 +95,10 @@ function soldierAnimation:SetState(Speed: number, self.Soldier: self.Soldier)
 	self.Soldier.StateQueue[#self.Soldier.StateQueue + 1] = LiveSpeed
 	repeat
 		task.wait()
-	until (self.Soldier.StateQueue[#self.Soldier.StateQueue] == LiveSpeed and tick() * 10 > math.ceil(timeStart * 10))
-		or tick() - timeStart > 3
+	until (
+			self.Soldier.StateQueue[#self.Soldier.StateQueue] == LiveSpeed
+			and tick() * 10 > math.ceil(timeStart * 10)
+		) or tick() - timeStart > 3
 	if tick() - timeStart > 2 then
 		return
 	end
@@ -101,25 +108,26 @@ function soldierAnimation:SetState(Speed: number, self.Soldier: self.Soldier)
 	local state = 0
 	local humanoid: Humanoid = self.Soldier.Humanoid
 
-	if self.Soldier.Character:GetAttribute("Pose") == "Stand" then
+	if character:GetAttribute("Pose") == "Stand" then
 		state += 0
 		humanoid.WalkSpeed = 16
-	elseif self.Soldier.Character:GetAttribute("Pose") == "Crawl" then
+	elseif character:GetAttribute("Pose") == "Crawl" then
 		state += 6
 		humanoid.WalkSpeed = 4
-	elseif self.Soldier.Character:GetAttribute("Pose") == "Crouch" then
+	elseif character:GetAttribute("Pose") == "Crouch" then
 		state += 3
 		humanoid.WalkSpeed = 5
 	end
 
 	if self.Soldier.StateQueue[#self.Soldier.StateQueue] == 0 then
-		if self.Soldier.Character:GetAttribute("Covering") then
-			state = 10 -- hiding
-		elseif
-			self.Soldier.Character:GetAttribute("Building")
-			or self.Soldier.Character:GetAttribute("Healing")
-			or self.Soldier.Character:GetAttribute("PlantingBomb")
+		-- if character:GetAttribute("Covering") then
+		-- 	state = 10 -- hiding
+		if
+			character:GetAttribute("Building")
+			or character:GetAttribute("Healing")
+			or character:GetAttribute("PlantingBomb")
 		then
+			print("healing")
 			state = 12 -- building
 		elseif self.Soldier.ClosesEnemy then
 			state += 2 -- targeting
@@ -130,7 +138,7 @@ function soldierAnimation:SetState(Speed: number, self.Soldier: self.Soldier)
 		state += 3 -- running
 	end
 
-	self.Soldier.State = soldierAnimation:PlayAnim(state, self.Soldier.Humanoid, self.Soldier.Loaded)
+	self.Soldier.State = self.Soldier.Animations:PlayAnim(state)
 
 	if self.Soldier.StateQueue[#self.Soldier.StateQueue] == Speed then
 		table.clear(self.Soldier.StateQueue)
@@ -150,7 +158,7 @@ function soldierAnimation:isFiring(): boolean
 		or self.Soldier.State.Name == soldierAnimation.Animation["FiringCrouching"]
 end
 
-function soldierAnimation:isIdle() : boolean
+function soldierAnimation:isIdle(): boolean
 	return self.Soldier.State.Name == soldierAnimation.Animation["IdleCrawling"]
 		or self.Soldier.State.Name == soldierAnimation.Animation["IdleStanding"]
 		or self.Soldier.State.Name == soldierAnimation.Animation["IdleCrouching"]

@@ -80,3 +80,6 @@ Progresstion:
 
 -alow for custiom matches
 -add fog of war
+
+Profromace ideas:
+    refresh only soldier that are veiw of camera

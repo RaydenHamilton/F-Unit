@@ -51,6 +51,9 @@ function soldierEffects:AngleArms()
 end
 
 function soldierEffects:Bullet(gun, lookAt, distance)
+	if distance and distance > 2048 then
+		distance = 2048
+	end
 	local bullet = Instance.new("Part")
 	bullet.Size = Vector3.new(0.05, 0.05, distance or 2048)
 	bullet.CastShadow = false
@@ -85,12 +88,15 @@ function soldierEffects:GunEffects()
 	task.wait(0.1)
 	Flash(false)
 end
+
 function soldierEffects:SetUnderlay()
-	local center = self.Soldier.HumanoidRootPart.Position + Vector3.new(0, -2, 0)
-	local raycastResult = workspace:Raycast(center, Vector3.new(0, -1000, 0), self.Soldier.ShotRules)
+	local center: Vector3 = self.Soldier.HumanoidRootPart.Position
+	local raycastResult =
+		workspace:Raycast(center - Vector3.new(0, 2, 0), Vector3.new(0, -1000, 0), self.Soldier.ShotRules)
 	self.Soldier.Character.Underlay.CFrame = CFrame.new(
 		raycastResult.Position + Vector3.new(0.001),
 		(raycastResult.Position + Vector3.new(0.001)) + raycastResult.Normal
 	) * CFrame.Angles(math.rad(-90), 0, math.rad(-0))
 end
+
 return soldierEffects

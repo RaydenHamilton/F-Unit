@@ -2,21 +2,32 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
-local ServerStorage = game:GetService("ServerStorage")
 
 --// Modules
-local playerData = require(ServerStorage.PlayerData)
+local PlayerData = require(script.Parent.PlayerData)
 local soldierClasses = require(ReplicatedStorage.Shared.SoldierClasses)
 local SquadClasses = require(ReplicatedStorage.Shared.SquadClasses)
 local VehicleClasses = require(ReplicatedStorage.Shared.VehicleClasses)
 local WeaponClasses = require(ReplicatedStorage.Shared.WeaponClasses)
-local CreateSoldierModule = require(script.Parent.SoldierModules.soldierModule)
+local Soldier = require(script.Parent.SoldierModules.Soldier)
 --// Varubles
 local PlayerInstances = {}
-local SpawnInit = ReplicatedStorage.Remotes.RemoteFunctions.SpawnInit
+local SpawnUnit = ReplicatedStorage.Remotes.RemoteFunctions.SpawnUnit
+local NPCEvents = ReplicatedStorage.NPCEvents
+local classList = {
+	["Soldiers"] = soldierClasses,
+	["Squads"] = SquadClasses,
+	["Vehicles"] = VehicleClasses,
+	["Weapons"] = WeaponClasses,
+}
+local SoldierInstance = {}
+
+local function GetSoldierFromCharacter(soldierCharacter)
+	return SoldierInstance[soldierCharacter]
+end
 
 local function onPlayerAdded(player: Player) -- change to on round start
-	PlayerInstances[player.UserId] = playerData.New(player)
+	PlayerInstances[player.UserId] = PlayerData.New(player)
 	ReplicatedStorage.NPCEvents.TellClientMoney:FireClient(player, PlayerInstances[player.UserId].Points)
 	while task.wait(1) and Players:FindFirstChild(player.Name) do
 		PlayerInstances[player.UserId]:AddPoints()
@@ -39,7 +50,13 @@ local function buySoldier(player: Player, soldierType, spawn: Model)
 		(soldier.PrimaryPart :: BasePart).CFrame = CFrame.new((rootPart.Position + Vector3.new(0, 5, 0)))
 			* CFrame.new(direction * 10)
 
-		CreateSoldierModule.new(player.UserId, soldier, soldierClasses[soldierType[i]])
+		local SoldierData = Soldier.new(player.UserId, soldier, soldierClasses[soldierType[i]])
+		SoldierInstance[SoldierData.Character] = SoldierData
+		local removingEvent
+		removingEvent = SoldierData.Character.Destroying:Connect(function()
+			SoldierInstance[SoldierData.Character] = nil
+			removingEvent:Disconncet()
+		end)
 	end
 end
 
@@ -48,27 +65,12 @@ local function onPlayerRemoved(player)
 	PlayerInstances[player.UserId] = nil
 end
 
-local function GetClass(tabName: string)
-	if tabName == "Soldiers" then
-		return soldierClasses
-	elseif tabName == "Squads" then
-		return SquadClasses
-	elseif tabName == "Vehicles" then
-		return VehicleClasses
-	elseif tabName == "Weapons" then
-		return WeaponClasses
-	end
-	warn("not a valid class")
-	return nil
-end
-
 --// Events
 Players.PlayerRemoving:Connect(onPlayerRemoved)
 Players.PlayerAdded:Connect(onPlayerAdded)
-ReplicatedStorage.NPCEvents.Heal.OnServerEvent:Connect(buySoldier)
 
-SpawnInit.OnServerInvoke = function(player, tabName: string, className: string, spawn: Model)
-	local classes = GetClass(tabName)
+SpawnUnit.OnServerInvoke = function(player, tabName: string, className: string, spawn: Model)
+	local classes = classList[tabName]
 	if classes[className] then
 		local classInfo = classes[className]
 		if PlayerInstances[player.UserId].Points >= classInfo.Cost then
@@ -83,3 +85,22 @@ SpawnInit.OnServerInvoke = function(player, tabName: string, className: string, 
 	end
 	return false
 end
+
+NPCEvents.Move.OnServerEvent:Connect(function(_, soldierCharacter, state, position)
+	GetSoldierFromCharacter(soldierCharacter).Events:OnMoveTo(state, position)
+end)
+NPCEvents.PlaceObject.OnServerEvent:Connect(function(_, soldierCharacter, sizeOfWall, startOfWall, endOfWall)
+	GetSoldierFromCharacter(soldierCharacter).Events:MakeWall(sizeOfWall, startOfWall, endOfWall)
+end)
+NPCEvents.Heal.OnServerEvent:Connect(function(_, soldierCharacter, soldierHealing)
+	GetSoldierFromCharacter(soldierCharacter).Events:HealCharacter(soldierHealing)
+end)
+NPCEvents.PlantBomb.OnServerEvent:Connect(function(_, soldierCharacter, mousePosition, valut)
+	GetSoldierFromCharacter(soldierCharacter).Events:PlantBomb(mousePosition, valut)
+end)
+NPCEvents.SetPose.OnServerEvent:Connect(function(_, soldierCharacter, pose)
+	GetSoldierFromCharacter(soldierCharacter).Events:SetPose(pose)
+end)
+NPCEvents.NewTarget.OnServerEvent:Connect(function(_, soldierCharacter, newTarget)
+	GetSoldierFromCharacter(soldierCharacter).Events:SetClosesEnemy(newTarget)
+end)

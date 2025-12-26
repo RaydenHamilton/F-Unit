@@ -1,21 +1,14 @@
---!strict
 --// Services
 local RunService = game:GetService("RunService")
 local PathfindingService = game:GetService("PathfindingService")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 
 --// Modules
-local soldierAnimation = require(script.Parent.soldierAnimationController)
-local soldierEffects = require(script.Parent.soldierEffects)
-local SoldierEvents = require(script.Parent.SoldierEvents)
-local nameModule = require(script.Parent.NameModule)
-local DeathModule = require(script.Parent.DeathModule)
-
---// Type Declarations
-
---// Local Events
-local NPCEvents = ReplicatedStorage.NPCEvents
+local Animations = require(script.Parent.Animations)
+local Effects = require(script.Parent.Effects)
+local Events = require(script.Parent.Events)
+local Names = require(script.Parent.Names)
+local Deaths = require(script.Parent.Deaths)
 
 --// Main Module
 local Soldier = {
@@ -24,24 +17,15 @@ local Soldier = {
 		Crawling = "Crawling",
 		Crewching = "Crewching",
 	},
-	Path = PathfindingService:CreatePath({
-		AgentCanJump = false,
-		AgentRadius = 1.7,
-		WaypointSpacing = 1,
-		Costs = { Center = 0.1 },
-	}),
 }
 Soldier.__index = Soldier
 
---// Data Table
-local AllSoldiers = {}
-
 --// Module Functions
-function Soldier.new(userID: number, soldier: Model, class)
+function Soldier.new(userID: number, soldier, class)
 	local self = setmetatable({
 		---userID---
 		Owner = userID,
-		Name = nameModule.name(),
+		Name = Names.name(),
 		---Class---
 		Class = class,
 		---varuables---
@@ -54,9 +38,13 @@ function Soldier.new(userID: number, soldier: Model, class)
 		Humanoid = soldier:WaitForChild("Humanoid") :: Humanoid,
 		HumanoidRootPart = soldier.PrimaryPart :: BasePart,
 		LastEnemieSet = 0,
-		Path = Soldier.Path,
+		Path = PathfindingService:CreatePath({
+			AgentCanJump = false,
+			AgentRadius = 1.7,
+			WaypointSpacing = 1,
+			Costs = { Center = 0.1 },
+		}),
 	}, Soldier)
-
 	soldier:SetAttribute("Pose", "Stand")
 	soldier:SetAttribute("Owner", userID)
 	soldier:SetAttribute("Covering", false)
@@ -70,54 +58,31 @@ function Soldier.new(userID: number, soldier: Model, class)
 	soldier:SetAttribute("Range", class.Range)
 
 	--// Setup \\--
-	self.Animation = soldierAnimation.new(soldier)
-	self.Death = DeathModule.new(self)
-	self.Events = SoldierEvents.new(self)
-	self.Effects = soldierEffects.new(self)
+	self.Animations = Animations.new(self)
+	self.Death = Deaths.new(self)
+	self.Events = Events.new(self)
+	self.Effects = Effects.new(self)
 
 	--// Calls \\--
-	self.Animation:SetState(0, self)
 	self.Humanoid.AutoRotate = true
 	self.Humanoid:SetStateEnabled(Enum.HumanoidStateType.Climbing, false)
 	self.ShotRules = self:CreateRaycastPrams()
-	self.Loaded = self.Animation:LoadAnimation(soldier:WaitForChild("Humanoid") :: Humanoid)
 	self.HumanoidRootPart:SetNetworkOwner(nil)
+	self.Loaded = self.Animations:LoadAnimation()
+	self.Animations:SetState(0)
 
 	--// Connections \\--
 	self.Connections = {
 		self.Humanoid.Running:Connect(function(speed: number)
-			self.Animation:SetState(speed, self)
+			self.Animations:SetState(speed)
+		end),
+		self.Humanoid.Died:Connect(function()
+			self.Death:PlayDeath()
 		end),
 		RunService.Heartbeat:Connect(function()
 			self:CanShootEnemy()
 		end),
-		NPCEvents.Move.OnServerEvent:Connect(function(...)
-			self.Events:OnMoveTo(...)
-		end),
-		NPCEvents.PlaceObject.OnServerEvent:Connect(function(...)
-			self.Events:MakeWall(...)
-		end),
-		NPCEvents.Heal.OnServerEvent:Connect(function(...)
-			self.Events:HealCharacter(...)
-		end),
-		NPCEvents.PlantBomb.OnServerEvent:Connect(function(...)
-			self.Events:PlantBomb(...)
-		end),
-		NPCEvents.SetPose.OnServerEvent:Connect(function(...)
-			self.Events:SetPose(...)
-		end),
-		self.Humanoid.Died:Connect(function()
-			self.Death:PlayDeath()
-			AllSoldiers[self.Character] = nil
-		end),
-		NPCEvents.NewTarget.OnServerEvent:Connect(function(...)
-			if ... then
-				self.Events:SetClosesEnemy(...)
-			end
-		end),
 	}
-
-	AllSoldiers[self.Character] = self
 	return self
 end
 --// Local Functions
@@ -158,9 +123,9 @@ end
 function Soldier:Reload()
 	self.Shots += 1
 	if self.Shots >= self.Class.ClipSize then
-		if self.Character:GetAttribute("Covering") and not soldierAnimation.isRunning(self) then
+		if self.Character:GetAttribute("Covering") and not self.Animations:isRunning() then
 			-- cover
-			self.State = self.Animations:PlayAnim(10, self.Humanoid, self.Loaded)
+			self.State = self.Animations:PlayAnim(10)
 		end
 		self.Shots = 0
 		local playTime = self.Loaded[11].Length / self.Class.ReloadTime
@@ -173,10 +138,10 @@ function Soldier:Reload()
 end
 
 function Soldier:FireGun()
-	if not soldierAnimation.isFiring(self) then
-		--self.State = soldierAnimation.PlayAnim(firing,self.Character.Humanoid,self.Loaded)
+	if not self.Animations:isFiring() then
 		self.LaststateChange = tick()
-		self:AngleArms()
+		self.Effects:AngleArms()
+		self.Animations:SetState(0)
 	end
 	if tick() - self.LaststateChange > 0.5 then
 		self.Character:SetAttribute("GunCoolDown", true)
@@ -202,16 +167,16 @@ function Soldier:FireGun()
 		local lookAt: Vector3 = self.HumanoidRootPart.CFrame.LookVector + aimAt * self.Class.Range + offset
 
 		local raycastData: RaycastResult = Workspace:Raycast(origin, lookAt, self.ShotRules)
-		soldierEffects.AngleArms(self)
+		self.Effects:AngleArms()
 		if raycastData then
 			self:DealDamage(raycastData.Instance)
-			soldierEffects:Bullet(self.Character:WaitForChild("Handle") :: Part, lookAt, raycastData.Distance)
+			self.Effects:Bullet(self.Character:WaitForChild("Handle") :: Part, lookAt, raycastData.Distance)
 		else
-			soldierEffects:Bullet(self.Character:WaitForChild("Handle") :: Part, lookAt, math.huge)
+			self.Effects:Bullet(self.Character:WaitForChild("Handle") :: Part, lookAt, math.huge)
 		end
 
 		coroutine.resume(coroutine.create(function()
-			soldierEffects.GunEffects(self)
+			self.Soldier.Events:GunEffects(self)
 		end))
 
 		self:Reload()
@@ -264,7 +229,7 @@ function Soldier:GetNewEnemy() -- gets a new enamy if it is needed
 					self.LastEnemieSet = tick() + math.random(0, 17) / 10
 					self.ClosesHumanoid = self.ClosesEnemy.Humanoid
 				else
-					if not self.Character:GetAttribute("Covering") and not soldierAnimation.isRunning(self) then
+					if not self.Character:GetAttribute("Covering") and not self.Animations:isRunning() then
 						(self.Character:WaitForChild("Hammer") :: Part).Transparency = 1
 						(self.Character:WaitForChild("Handle") :: Part).Transparency = 0
 					end
@@ -285,6 +250,7 @@ function Soldier:LookAtEnemy() -- lookats enemy
 		and self.ClosesEnemy.Humanoid.Health > 0
 	then
 		if #self.StateQueue == 0 and tick() - self.LaststateChange > 0.3 then
+			self.Effects:SetUnderlay()
 			self.Character:PivotTo(
 				self.HumanoidRootPart.CFrame:Lerp(
 					CFrame.new(
@@ -298,14 +264,16 @@ function Soldier:LookAtEnemy() -- lookats enemy
 					0.15
 				)
 			)
-			self:CanFireAt()
+			task.spawn(coroutine.create(function()
+				self:CanFireAt()
+			end))
 		end
 	end
 end
 
 function Soldier:CanShootEnemy()
 	local character = self.Character
-	if self.State.Name ~= soldierAnimation.Animation.Reloading and not soldierAnimation.isRunning(self) then
+	if self.State.Name ~= Animations.Animation.Reloading and not self.Animations:isRunning() then
 		if
 			not character:GetAttribute("Building")
 			and not character:GetAttribute("Healing")
@@ -313,12 +281,9 @@ function Soldier:CanShootEnemy()
 		then
 			self:GetNewEnemy()
 			self:LookAtEnemy()
-		elseif
-			character:GetAttribute("Building")
-			or character:GetAttribute("Healing")
-			or character:GetAttribute("PlantingBomb")
-		then
-			self:SetPose()
+			if self.ClosesEnemy == nil and self.Character:GetAttribute("Covering") then
+				self.Animations:PlayAnim(10)
+			end
 		end
 	end
 end

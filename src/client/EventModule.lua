@@ -30,15 +30,15 @@ local botGui = player:WaitForChild("PlayerGui"):WaitForChild("Main")
 
 --// Module Functions
 EventModule.crawl = function()
-	setPose:FireServer("Crawl", Target.Value)
+	setPose:FireServer(Target.Value,"Crawl")
 end
 
 EventModule.crouch = function()
-	setPose:FireServer("Crouch", Target.Value)
+	setPose:FireServer(Target.Value,"Crouch" )
 end
 
 EventModule.stand = function()
-	setPose:FireServer("Stand", Target.Value)
+	setPose:FireServer(Target.Value,"Stand" )
 end
 
 EventModule.placeWall = function()
@@ -63,10 +63,10 @@ EventModule.placeWall = function()
 			local partEnd = mouse.Hit.Position
 			if Marker.Value.Color == Color3.new(0, 0, 1) then
 				placeObject:FireServer(
+					Target.Value,
 					size,
 					ClientStates.partStart - Vector3.new(0, Marker.Value.Size.Y / 2, 0),
-					partEnd,
-					Target.Value
+					partEnd
 				)
 			end
 			MiscFunctions.unselect()
@@ -114,7 +114,7 @@ end
 
 EventModule.OpenBunker = function()
 	if highlight.Value and highlight.Value.Parent.Name == "Door Closed" then
-		NPCEvents.PlantBomb:FireServer(mouse.Hit.Position, Target.Value, highlight.Value.Parent)
+		NPCEvents.PlantBomb:FireServer(Target.Value, mouse.Hit.Position, highlight.Value.Parent)
 		MiscFunctions.unselect()
 		return true
 	end
@@ -124,14 +124,14 @@ end
 EventModule.clickNewEnemy = function()
 	if highlight.Value and highlight.Value.Parent.Parent.Name == "Targets" then
 		-- Makes them target the new enemy
-		NPCEvents.NewTarget:FireServer(highlight.Value.Parent, Target.Value)
+		NPCEvents.NewTarget:FireServer(Target.Value, highlight.Value.Parent)
 		MiscFunctions.removeObjects()
 	end
 end
 
 EventModule.MoveTo = function()
 	if Target.Value and mouse.Target and ClientStates.newposition then
-		move:FireServer(ClientStates.newposition, Target.Value, createEffects.makeHologram(ClientStates.newposition))
+		move:FireServer(Target.Value, ClientStates.newposition, createEffects.makeHologram(ClientStates.newposition))
 		MiscFunctions.unselect()
 	end
 end

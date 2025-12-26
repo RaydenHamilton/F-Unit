@@ -42,7 +42,7 @@ local function getMouseRaycastTarget()
 	local ray = camera:ViewportPointToRay(mousePos.X, mousePos.Y)
 
 	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Blacklist
+	params.FilterType = Enum.RaycastFilterType.Exclude
 	params.FilterDescendantsInstances = { Workspace.ClientParts }
 	params.IgnoreWater = true
 
@@ -112,7 +112,7 @@ local function NoSoldiersNearSpawn()
 	local raycastResult = getMouseRaycastTarget()
 	local spawnModel = raycastResult and raycastResult.Instance.Parent.Parent
 	local Params = OverlapParams.new()
-	Params.FilterType = Enum.RaycastFilterType.Whitelist
+	Params.FilterType = Enum.RaycastFilterType.Include
 	Params.FilterDescendantsInstances = { Workspace.Targets }
 	local getTouchingParts = Workspace:GetPartBoundsInBox(spawnModel.PrimaryPart.CFrame, checkSpawnSize, Params)
 	return #getTouchingParts == 0
