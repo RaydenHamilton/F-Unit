@@ -5,6 +5,7 @@ local Workspace = game:GetService("Workspace")
 local RunService = game:GetService("RunService")
 
 --// Variables
+local camera = workspace.CurrentCamera
 local targets = Workspace:WaitForChild("Targets")
 local player = Players.LocalPlayer
 local UserId = player.UserId
@@ -27,14 +28,18 @@ local Soldiers: { Model } = {}
 --// Local Functions
 local function SetsoldierUnderlay()
 	for _, soldier: Model in pairs(Soldiers) do
-		if not soldier.PrimaryPart or not soldier:FindFirstChild("Underlay") then
+		local underlay = soldier:FindFirstChild("Underlay") :: Part
+		local rootpart = soldier:IsA("Model") and soldier.PrimaryPart :: Part
+		if not rootpart or not underlay or not soldier:FindFirstChild("Head") then
 			continue
 		end
-		if soldier:FindFirstChild("Head") then
+		local _, seeUnderlay = camera:WorldToScreenPoint(underlay.Position)
+		local _, seeRootpart = camera:WorldToScreenPoint(rootpart.Position)
+		if seeRootpart or seeUnderlay then
 			pcall(function()
-				local raycastResult = workspace:Raycast(soldier.PrimaryPart.Position, Ray_length, ShotRules)
+				local raycastResult = workspace:Raycast(rootpart.Position, Ray_length, ShotRules)
 				if raycastResult then
-					soldier.Underlay.CFrame = CFrame.new(
+					underlay.CFrame = CFrame.new(
 						raycastResult.Position + UNDERLAY_OFFSET,
 						(raycastResult.Position + UNDERLAY_OFFSET) + raycastResult.Normal
 					) * UNDERLAY_ROTATION

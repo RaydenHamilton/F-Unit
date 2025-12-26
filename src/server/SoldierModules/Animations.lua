@@ -71,7 +71,6 @@ function soldierAnimation:LoadAnimation()
 end
 
 function soldierAnimation:PlayAnim(number: number)
-	print(number, "play")
 	for _, v in pairs(self.Soldier.Humanoid:GetPlayingAnimationTracks()) do
 		if v.Name ~= self.Soldier.Loaded[number].Name then
 			v:Stop()
@@ -84,7 +83,6 @@ function soldierAnimation:PlayAnim(number: number)
 end
 
 function soldierAnimation:SetState(Speed: number)
-	print(Speed, "speed")
 	local character = self.Soldier.Character
 	local rightShoulder = character:WaitForChild("Torso"):WaitForChild("Right Shoulder") :: Motor6D
 	local leftShoulder = character:WaitForChild("Torso"):WaitForChild("Left Shoulder") :: Motor6D
@@ -127,7 +125,6 @@ function soldierAnimation:SetState(Speed: number)
 			or character:GetAttribute("Healing")
 			or character:GetAttribute("PlantingBomb")
 		then
-			print("healing")
 			state = 12 -- building
 		elseif self.Soldier.ClosesEnemy then
 			state += 2 -- targeting
