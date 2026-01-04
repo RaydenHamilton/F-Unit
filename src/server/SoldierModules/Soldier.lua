@@ -18,6 +18,7 @@ local Soldier = {
 		Crewching = "Crewching",
 	},
 }
+
 Soldier.__index = Soldier
 
 --// Module Functions
@@ -85,6 +86,7 @@ function Soldier.new(userID: number, soldier, class)
 	}
 	return self
 end
+
 --// Local Functions
 function Soldier:DamageSandBags(hit)
 	hit.Parent.Value.Value -= self.Class.Damage
@@ -222,16 +224,20 @@ end
 function Soldier:GetNewEnemy() -- gets a new enamy if it is needed
 	if self:notIsEnemieTargetAvalable() then -- seeing if they need a new target
 		self.ClosesEnemy = nil
-		for _, enemys in pairs(Workspace.Targets:GetChildren()) do --looks at all avalabe targets
-			if self:isAnEnemie(enemys) then -- makes sure they are not that same team
-				if self:isBestNewTraget(enemys) then -- makes sure they are alowed to be shot at
-					self.ClosesEnemy = enemys
-					self.LastEnemieSet = tick() + math.random(0, 17) / 10
-					self.ClosesHumanoid = self.ClosesEnemy.Humanoid
-				else
-					if not self.Character:GetAttribute("Covering") and not self.Animations:isRunning() then
-						(self.Character:WaitForChild("Hammer") :: Part).Transparency = 1
-						(self.Character:WaitForChild("Handle") :: Part).Transparency = 0
+		for _, teams in pairs(Workspace.Targets:GetChildren()) do --looks at all avalabe targets
+			if teams.Name ~= tostring(self.Character:GetAttribute("Owner")) then
+				for _, enemy in pairs(teams:GetChildren()) do
+					if self:isAnEnemie(enemy) then -- makes sure they are not that same team
+						if self:isBestNewTraget(enemy) then -- makes sure they are alowed to be shot at
+							self.ClosesEnemy = enemy
+							self.LastEnemieSet = tick() + math.random(0, 17) / 10
+							self.ClosesHumanoid = self.ClosesEnemy.Humanoid
+						else
+							if not self.Character:GetAttribute("Covering") and not self.Animations:isRunning() then
+								(self.Character:WaitForChild("Hammer") :: Part).Transparency = 1
+								(self.Character:WaitForChild("Handle") :: Part).Transparency = 0
+							end
+						end
 					end
 				end
 			end

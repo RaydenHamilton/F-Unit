@@ -4,16 +4,9 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
 local UserInputService = game:GetService("UserInputService")
---// Modules
-local Modules = Players.LocalPlayer:WaitForChild("PlayerScripts"):WaitForChild("Client")
--- local createInstances = require(script.CreateInstances)
-local createEffects = require(Modules.CreateEffects)
-local ClientStates = require(Modules.ClientStates)
-local miscFunctions = require(Modules.MiscFunctions)
-local eventModule = require(Modules.EventModule)
-local logicModule = require(Modules.LogicModule)
 
 --// Varubles
+local Modules = Players.LocalPlayer.PlayerScripts.Client
 local player = Players.LocalPlayer
 local botGui = player:WaitForChild("PlayerGui"):WaitForChild("Main")
 local actions = botGui.Actions
@@ -24,6 +17,15 @@ local Target = ReplicatedStorage.States.Target
 local checkSpawnSize = Vector3.new(20, 20, 20)
 local colorWhite = Color3.new(1, 1, 1)
 local colorBlack = Color3.new(0, 0, 0)
+local selectionBox
+local selectionConnection
+
+--// Modules
+local createEffects = require(Modules.CreateEffects)
+local ClientStates = require(Modules.ClientStates)
+local miscFunctions = require(Modules.MiscFunctions)
+local eventModule = require(Modules.EventModule)
+local logicModule = require(Modules.LogicModule)
 
 --// Gui
 local wallButton = botGui["Build"].Background.ImageButton
@@ -122,27 +124,48 @@ local function OpenShopUI()
 	player.PlayerGui.ShopUI.Enabled = true
 	Highlight.Value.OutlineColor = colorWhite
 end
+local function isVector2InFrame(point, frame: Frame)
+	local min = Vector2.new(frame.Position.X.Offset, frame.Position.Y.Offset)
+	local max = min - Vector2.new(frame.Size.X.Offset, frame.Size.Y.Offset)
+
+	return (point.X >= min.X and point.X <= max.X and point.Y >= min.Y and point.Y <= max.Y)
+end
 
 local function onLeftClick()
-	if SpawnHighlighted() then
-		--// check if there are players near spawn
-		if NoSoldiersNearSpawn() then
-			OpenShopUI()
+	selectionConnection:Disconnect()
+	if selectionBox.size == UDim2.fromOffset(0, 0) then
+		if SpawnHighlighted() then
+			--// check if there are players near spawn
+			if NoSoldiersNearSpawn() then
+				OpenShopUI()
+				return
+			else
+				FlashOutLine()
+				return
+			end
+		elseif ClientStates.placeingWall then
+			eventModule.placeWall()
 			return
-		else
-			FlashOutLine()
+		elseif ClientStates.HealingTeamate then
+			eventModule.hoverHealableWho()
 			return
+		else --// if not building or healing
+			eventModule.clickNewEnemy()
+			changeSoldier()
 		end
-	elseif ClientStates.placeingWall then
-		eventModule.placeWall()
-		return
-	elseif ClientStates.HealingTeamate then
-		eventModule.hoverHealableWho()
-		return
-	else --// if not building or healing
-		eventModule.clickNewEnemy()
-		changeSoldier()
+	else
+		local slectedTable = {}
+		for _, soldier in Workspace.Targets[player.UserId]:GetChildren() do
+			local vector3, onscreen = camera:WorldToViewportPoint(soldier:GetPivot().Position)
+			local vector2 = Vector2.new(vector3.X, vector3.Y)
+			if onscreen and isVector2InFrame(vector2, selectionBox) then
+				table.insert(slectedTable, soldier)
+				print(slectedTable)
+			end
+		end
 	end
+
+	selectionBox:Destroy()
 end
 
 local function inputChanged(input, onGui)
@@ -166,9 +189,18 @@ local function onRightClick()
 	end
 end
 
+local function slecetionBox()
+	local frame, mouseX, mouseY = createEffects.CreateSlectionBox()
+	selectionBox = frame
+	selectionConnection = RunService.Heartbeat:Connect(function()
+		frame.Size = UDim2.fromOffset(mouseX - mouse.X, mouseY - mouse.Y)
+	end)
+end
+
 --// Events
 UserInputService.InputChanged:Connect(inputChanged)
 
+mouse.Button1Down:Connect(slecetionBox)
 mouse.Button1Up:Connect(onLeftClick)
 mouse.Button2Up:Connect(onRightClick)
 

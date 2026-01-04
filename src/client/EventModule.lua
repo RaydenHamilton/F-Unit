@@ -30,15 +30,15 @@ local botGui = player:WaitForChild("PlayerGui"):WaitForChild("Main")
 
 --// Module Functions
 EventModule.crawl = function()
-	setPose:FireServer(Target.Value,"Crawl")
+	setPose:FireServer(Target.Value, "Crawl")
 end
 
 EventModule.crouch = function()
-	setPose:FireServer(Target.Value,"Crouch" )
+	setPose:FireServer(Target.Value, "Crouch")
 end
 
 EventModule.stand = function()
-	setPose:FireServer(Target.Value,"Stand" )
+	setPose:FireServer(Target.Value, "Stand")
 end
 
 EventModule.placeWall = function()
@@ -122,7 +122,7 @@ EventModule.OpenBunker = function()
 end
 
 EventModule.clickNewEnemy = function()
-	if highlight.Value and highlight.Value.Parent.Parent.Name == "Targets" then
+	if highlight.Value and highlight.Value:FindFirstAncestor("Targets") then
 		-- Makes them target the new enemy
 		NPCEvents.NewTarget:FireServer(Target.Value, highlight.Value.Parent)
 		MiscFunctions.removeObjects()

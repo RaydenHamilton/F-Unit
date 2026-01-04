@@ -120,11 +120,6 @@ function Events:PlantBomb(Valut: Vector3, doors)
 			end
 		end
 		self.Soldier.State = self.Soldier.Animations:PlayAnim(12)
-		for _, v in pairs(Workspace.Targets:GetChildren()) do
-			if v:GetAttribute("Owner") ~= self.Soldier.Owner then
-				v.Humaniod.Health = 0
-			end
-		end
 		--TODO make this work Does not work cuz i idiot
 		-- make the guy kill the leader after the door opens
 		--self.Soldier.ClosesEnemy = (doors.Parent :: Folder).leader

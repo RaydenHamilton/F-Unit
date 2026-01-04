@@ -203,4 +203,16 @@ CreateEffects.makeHologram = function(start)
 	return false
 end
 
+function CreateEffects.CreateSlectionBox()
+	local frame = Instance.new("Frame")
+	frame.BackgroundTransparency = 0.9
+	frame.BorderSizePixel = 1
+	frame.Size = UDim2.fromOffset(0, 0)
+	frame.Parent = player.PlayerGui.ScreenSelection
+	frame.Position = UDim2.fromOffset(mouse.X, mouse.Y)
+	frame.AnchorPoint = Vector2.new(1, 1)
+	frame.BackgroundColor3 = Color3.new(1, 1, 1)
+	return frame, mouse.X, mouse.Y
+end
+
 return CreateEffects

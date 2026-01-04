@@ -45,7 +45,7 @@ local function buySoldier(player: Player, soldierType, spawn: Model)
 		local direction = rootPart.CFrame:VectorToWorldSpace(localDirection) -- Convert to world space relative to rootPart
 
 		local soldier: Model = ReplicatedStorage.SoldierCopys[soldierType[i]]:Clone()
-		soldier.Parent = Workspace.Targets;
+		soldier.Parent = Workspace.Targets[player.UserId];
 
 		(soldier.PrimaryPart :: BasePart).CFrame = CFrame.new((rootPart.Position + Vector3.new(0, 5, 0)))
 			* CFrame.new(direction * 10)
