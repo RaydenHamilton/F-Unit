@@ -7,13 +7,15 @@ return {
 	["stepDirection"] = 0,
 	["whatStepIsItOn"] = 1,
 	["maxSteps"] = 50,
-	["selceted"] = nil,
+	["selected"] = nil,
 	["raycastParams"] = nil,
 	["newposition"] = nil,
-	["HealingTeamate"] = nil,
-	["placeingWall"] = nil,
+	["HealingTeammate"] = nil,
+	["PlacingWall"] = nil,
 	["region"] = {
 		Vector3.new(456, 66, 548) / 2,
 		-Vector3.new(456, 66, 548) / 2,
 	},
+	squad = {},
+	squadData = {},
 }

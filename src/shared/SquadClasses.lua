@@ -3,11 +3,20 @@ return {
 		["Cost"] = 50,
 		["Units"] = {
 			"Rifle",
+			"Rifle",
+			"Rifle",
+			"Rifle",
+			"Rifle",
+			"Rifle",
 		},
 	},
 	assaultInfantry = {
 		["Cost"] = 50,
 		["Units"] = {
+			"Rifle",
+			"Rifle",
+			"Rifle",
+			"Rifle",
 			"Rifle",
 		},
 	},
@@ -38,11 +47,16 @@ return {
 			"Rifle",
 			"Rifle",
 			"Rifle",
+			"Rifle",
+			"Rifle",
 		},
 	},
 	machanizedSNLF = {
 		["Cost"] = 50,
 		["Units"] = {
+			"Rifle",
+			"Rifle",
+			"Rifle",
 			"Rifle",
 		},
 	},
@@ -50,11 +64,19 @@ return {
 		["Cost"] = 50,
 		["Units"] = {
 			"Rifle",
+			"Rifle",
+			"Rifle",
+			"Rifle",
 		},
 	},
 	mineDisposal = {
 		["Cost"] = 50,
 		["Units"] = {
+			"Rifle",
+			"Rifle",
+			"Rifle",
+			"Rifle",
+			"Rifle",
 			"Rifle",
 		},
 	},

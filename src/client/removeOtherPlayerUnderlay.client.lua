@@ -24,18 +24,18 @@ local Ray_length = Vector3.new(0, -1000, 0)
 local UPDATE_EVERY = 3 -- update every 2 frames
 
 --// Local Functions
-local function SetsoldierUnderlay()
+local function SetSoldierUnderlay()
 	for _, soldier: Model in pairs(targets[player.UserId]:GetChildren()) do
 		local underlay = soldier:FindFirstChild("Underlay") :: Part
-		local rootpart = soldier:IsA("Model") and soldier.PrimaryPart :: Part
-		if not rootpart or not underlay or not soldier:FindFirstChild("Head") then
+		local rootPart = soldier:IsA("Model") and soldier.PrimaryPart :: Part
+		if not rootPart or not underlay or not soldier:FindFirstChild("Head") then
 			continue
 		end
 		local _, seeUnderlay = camera:WorldToScreenPoint(underlay.Position)
-		local _, seeRootpart = camera:WorldToScreenPoint(rootpart.Position)
-		if seeRootpart or seeUnderlay then
+		local _, seeRootPart = camera:WorldToScreenPoint(rootPart.Position)
+		if seeRootPart or seeUnderlay then
 			pcall(function()
-				local raycastResult = workspace:Raycast(rootpart.Position, Ray_length, ShotRules)
+				local raycastResult = workspace:Raycast(rootPart.Position, Ray_length, ShotRules)
 				if raycastResult then
 					underlay.CFrame = CFrame.new(
 						raycastResult.Position + UNDERLAY_OFFSET,
@@ -59,7 +59,7 @@ end
 RunService.Heartbeat:Connect(function()
 	frameCounter += 1
 	if frameCounter % UPDATE_EVERY == 0 then
-		SetsoldierUnderlay()
+		SetSoldierUnderlay()
 	end
 end)
 

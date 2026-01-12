@@ -74,18 +74,20 @@ MiscFunctions.isMyNPC = function(soldier: Model)
 end
 
 MiscFunctions.unselect = function()
-	if MiscFunctions.isMyNPC(Target.Value) then
-		if Target.Value:FindFirstChild("Underlay") then
-			Target.Value.Underlay.Color = Color3.fromRGB(255, 29, 33)
+	for _, soldier in ClientStates.squad do
+		if MiscFunctions.isMyNPC(soldier) then
+			if soldier:FindFirstChild("Underlay") then
+				soldier.Underlay.Color = Color3.fromRGB(255, 29, 33)
+			end
+			if ClientStates.selected then
+				ClientStates.selected:Disconnect()
+			end
+			botGui.Enabled = false
+			-- Clear all relevant variables at once
+			soldier, ClientStates.HealingTeammate, ClientStates.partStart, ClientStates.PlacingWall = nil, nil, nil, nil
 		end
-		if ClientStates.selceted then
-			ClientStates.selceted:Disconnect()
-		end
-		botGui.Enabled = false
-		-- Clear all relevant variables at once
-		Target.Value, ClientStates.HealingTeamate, ClientStates.partStart, ClientStates.placeingWall =
-			nil, nil, nil, nil
 	end
+	ClientStates.squad = {}
 	MiscFunctions.removeObjects()
 end
 
@@ -134,7 +136,7 @@ MiscFunctions.MouseIsInregion = function()
 end
 
 MiscFunctions.SoldierNotDoingAnything = function()
-	return not ClientStates.HealingTeamate and not ClientStates.placeingWall
+	return not ClientStates.HealingTeammate and not ClientStates.PlacingWall
 end
 
 return MiscFunctions

@@ -86,21 +86,45 @@ SpawnUnit.OnServerInvoke = function(player, tabName: string, className: string, 
 	return false
 end
 
-NPCEvents.Move.OnServerEvent:Connect(function(_, soldierCharacter, state, position)
-	GetSoldierFromCharacter(soldierCharacter).Events:OnMoveTo(state, position)
+NPCEvents.Move.OnServerEvent:Connect(function(_, soldiersCharacter, state, position)
+	for _, soldier in soldiersCharacter do
+		task.spawn(function()
+			GetSoldierFromCharacter(soldier).Events:OnMoveTo(state, position)
+		end)
+	end
 end)
-NPCEvents.PlaceObject.OnServerEvent:Connect(function(_, soldierCharacter, sizeOfWall, startOfWall, endOfWall)
-	GetSoldierFromCharacter(soldierCharacter).Events:MakeWall(sizeOfWall, startOfWall, endOfWall)
+NPCEvents.PlaceObject.OnServerEvent:Connect(function(_, soldiersCharacter, sizeOfWall, startOfWall, endOfWall)
+	for _, soldier in soldiersCharacter do
+		task.spawn(function()
+			GetSoldierFromCharacter(soldier).Events:MakeWall(sizeOfWall, startOfWall, endOfWall)
+		end)
+	end
 end)
-NPCEvents.Heal.OnServerEvent:Connect(function(_, soldierCharacter, soldierHealing)
-	GetSoldierFromCharacter(soldierCharacter).Events:HealCharacter(soldierHealing)
+NPCEvents.Heal.OnServerEvent:Connect(function(_, soldiersCharacter, soldierHealing)
+	for _, soldier in soldiersCharacter do
+		task.spawn(function()
+			GetSoldierFromCharacter(soldier).Events:HealCharacter(soldierHealing)
+		end)
+	end
 end)
-NPCEvents.PlantBomb.OnServerEvent:Connect(function(_, soldierCharacter, mousePosition, valut)
-	GetSoldierFromCharacter(soldierCharacter).Events:PlantBomb(mousePosition, valut)
+NPCEvents.PlantBomb.OnServerEvent:Connect(function(_, soldiersCharacter, mousePosition, valut)
+	for _, soldier in soldiersCharacter do
+		task.spawn(function()
+			GetSoldierFromCharacter(soldier).Events:PlantBomb(mousePosition, valut)
+		end)
+	end
 end)
-NPCEvents.SetPose.OnServerEvent:Connect(function(_, soldierCharacter, pose)
-	GetSoldierFromCharacter(soldierCharacter).Events:SetPose(pose)
+NPCEvents.SetPose.OnServerEvent:Connect(function(_, soldiersCharacter, pose)
+	for _, soldier in soldiersCharacter do
+		task.spawn(function()
+			GetSoldierFromCharacter(soldier).Events:SetPose(pose)
+		end)
+	end
 end)
-NPCEvents.NewTarget.OnServerEvent:Connect(function(_, soldierCharacter, newTarget)
-	GetSoldierFromCharacter(soldierCharacter).Events:SetClosesEnemy(newTarget)
+NPCEvents.NewTarget.OnServerEvent:Connect(function(_, soldiersCharacter, newTarget)
+	for _, soldier in soldiersCharacter do
+		task.spawn(function()
+			GetSoldierFromCharacter(soldier).Events:SetClosesEnemy(newTarget)
+		end)
+	end
 end)

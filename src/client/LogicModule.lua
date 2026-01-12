@@ -20,39 +20,43 @@ local createEffects = require(client.CreateEffects)
 --// Module Functions
 
 LogicModule.createwalkpart = function(position)
-	local path = PathfindingService:CreatePath({
-		AgentCanJump = false,
-		AgentRadius = 1.7,
-		WaypointSpacing = 1,
-		Costs = { Center = 0.1 },
-	})
-	if (position - Target.Value.Underlay.Position).magnitude < 999 then
-		path:ComputeAsync(Target.Value.Underlay.Position, position)
-		local waypoints = path:GetWaypoints()
-		if path.Status == Enum.PathStatus.Success then
-			return waypoints[#waypoints].Position
+	for _, soldier in ClientStates.squad do
+		local path = PathfindingService:CreatePath({
+			AgentCanJump = false,
+			AgentRadius = 1.7,
+			WaypointSpacing = 1,
+			Costs = { Center = 0.1 },
+		})
+		if (position - soldier.Underlay.Position).magnitude < 999 then
+			path:ComputeAsync(soldier.Underlay.Position, position)
+			local waypoints = path:GetWaypoints()
+			if path.Status == Enum.PathStatus.Success then
+				return waypoints[#waypoints].Position
+			else
+				return false
+			end
 		else
+			miscFunctions.removeObjects()
+
 			return false
 		end
-	else
-		miscFunctions.removeObjects()
-
-		return false
 	end
 end
 
 LogicModule.SetHologram = function()
-	if Target.Value and Target.Value:FindFirstChild("Underlay") then
-		if ClientStates.whatStepIsItOn > ClientStates.maxSteps then
-			miscFunctions.restStep(50)
-		end
-		local position = mouse.Hit.Position + Vector3.new(ClientStates.stepX, 0, ClientStates.stepY)
-		ClientStates.newposition = LogicModule.createwalkpart(position)
-		if ClientStates.newposition then
-			createEffects.makeHologram(ClientStates.newposition)
-			miscFunctions.restStep(50)
-		else
-			miscFunctions.incrementStep()
+	for _, soldier in ClientStates.squad do
+		if soldier and soldier:FindFirstChild("Underlay") then
+			if ClientStates.whatStepIsItOn > ClientStates.maxSteps then
+				miscFunctions.restStep(50)
+			end
+			local position = mouse.Hit.Position + Vector3.new(ClientStates.stepX, 0, ClientStates.stepY)
+			ClientStates.newposition = LogicModule.createwalkpart(position)
+			if ClientStates.newposition then
+				createEffects.makeHologram(ClientStates.newposition)
+				miscFunctions.restStep(50)
+			else
+				miscFunctions.incrementStep()
+			end
 		end
 	end
 end

@@ -10,7 +10,6 @@ local player = Players.LocalPlayer
 local NPCEvents = ReplicatedStorage.NPCEvents
 local Client = player.PlayerScripts.Client
 local highlight = ReplicatedStorage.States.Highlight
-local Target = ReplicatedStorage.States.Target
 local Marker = ReplicatedStorage.States.Marker
 
 --// Modules
@@ -30,24 +29,24 @@ local botGui = player:WaitForChild("PlayerGui"):WaitForChild("Main")
 
 --// Module Functions
 EventModule.crawl = function()
-	setPose:FireServer(Target.Value, "Crawl")
+	setPose:FireServer(ClientStates.squad, "Crawl")
 end
 
 EventModule.crouch = function()
-	setPose:FireServer(Target.Value, "Crouch")
+	setPose:FireServer(ClientStates.squad, "Crouch")
 end
 
 EventModule.stand = function()
-	setPose:FireServer(Target.Value, "Stand")
+	setPose:FireServer(ClientStates.squad, "Stand")
 end
 
 EventModule.placeWall = function()
-	ClientStates.placeingWall = true
-	local Walls = Target.Value:GetAttribute("Walls")
+	ClientStates.PlacingWall = true
+	local Walls = ClientStates.squadData["Walls"]
 	if not Marker.Value then
 		MiscFunctions.removeObjects()
 		createInstances.setUpMarker(mouse)
-		while ClientStates.placeingWall and task.wait() and Marker.Value do
+		while ClientStates.PlacingWall and task.wait() and Marker.Value do
 			Marker.Value.Position = mouse.Hit.Position + Vector3.new(0, Marker.Value.Size.Y / 2, 0)
 			if not MiscFunctions.MouseIsInregion() then
 				Marker.Value.Color = Color3.new(1, 0, 0)
@@ -63,7 +62,7 @@ EventModule.placeWall = function()
 			local partEnd = mouse.Hit.Position
 			if Marker.Value.Color == Color3.new(0, 0, 1) then
 				placeObject:FireServer(
-					Target.Value,
+					ClientStates.squad,
 					size,
 					ClientStates.partStart - Vector3.new(0, Marker.Value.Size.Y / 2, 0),
 					partEnd
@@ -96,25 +95,25 @@ EventModule.placeWall = function()
 end
 
 EventModule.clickSelfHeal = function()
-	heal:FireServer(Target.Value, Target.Value)
+	heal:FireServer(ClientStates.squad, ClientStates.squad)
 	MiscFunctions.unselect()
 end
 
 EventModule.clickedHeal = function()
 	botGui.Enabled = false
-	ClientStates.HealingTeamate = true
+	ClientStates.HealingTeammate = true
 	MiscFunctions.removeObjects()
 end
 
 EventModule.clickedPlaceWall = function()
-	ClientStates.placeingWall = true
+	ClientStates.PlacingWall = true
 	botGui.Enabled = false
 	EventModule.placeWall()
 end
 
 EventModule.OpenBunker = function()
 	if highlight.Value and highlight.Value.Parent.Name == "Door Closed" then
-		NPCEvents.PlantBomb:FireServer(Target.Value, mouse.Hit.Position, highlight.Value.Parent)
+		NPCEvents.PlantBomb:FireServer(ClientStates.squad, mouse.Hit.Position, highlight.Value.Parent)
 		MiscFunctions.unselect()
 		return true
 	end
@@ -124,21 +123,25 @@ end
 EventModule.clickNewEnemy = function()
 	if highlight.Value and highlight.Value:FindFirstAncestor("Targets") then
 		-- Makes them target the new enemy
-		NPCEvents.NewTarget:FireServer(Target.Value, highlight.Value.Parent)
+		NPCEvents.NewTarget:FireServer(ClientStates.squad, highlight.Value.Parent)
 		MiscFunctions.removeObjects()
 	end
 end
 
 EventModule.MoveTo = function()
-	if Target.Value and mouse.Target and ClientStates.newposition then
-		move:FireServer(Target.Value, ClientStates.newposition, createEffects.makeHologram(ClientStates.newposition))
+	if ClientStates.squad and ClientStates.newposition then
+		move:FireServer(
+			ClientStates.squad,
+			ClientStates.newposition,
+			createEffects.makeHologram(ClientStates.newposition)
+		)
 		MiscFunctions.unselect()
 	end
 end
 
 EventModule.hoverHealableWho = function()
 	if MiscFunctions.isMyNPC(mouse.Target.Parent) then
-		heal:FireServer(Target.Value, mouse.Target.Parent)
+		heal:FireServer(ClientStates.squad, mouse.Target.Parent)
 		MiscFunctions.unselect()
 	end
 end

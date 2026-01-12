@@ -77,7 +77,7 @@ CreateEffects.makeHologram = function(start)
 			start + Vector3.new(ClientStates.stepX, 2, ClientStates.stepY),
 			start + Vector3.new(0, 4, 0)
 		)
-		if raycastHit and raycastHit ~= true and Target.Value then
+		if raycastHit and raycastHit ~= true and { Target.Value } then
 			if not Hologram.Value then
 				Hologram.Value = ReplicatedStorage.ReplicatedObjects.hologram:Clone()
 				Hologram.Value.Parent = Workspace.ClientParts
@@ -125,49 +125,33 @@ CreateEffects.animateUnderlay = function(input)
 end
 
 CreateEffects.highlightCharacter = function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement and Target.Value and not ClientStates.placeingWall then
-		if not mouse.Target or not mouse.Target.Parent then
-			return
-		end
-		local hoverOver = mouse.Target.Parent
-		if hoverOver and hoverOver.Parent then
-			local owner = hoverOver:GetAttribute("Owner")
-			if not owner then
-				return
-			end
-			if owner ~= player.UserId and not ClientStates.HealingTeamate then
-				createInstances.SetHighlight(hoverOver, Color3.new(1, 0, 0), false, false)
-			elseif owner == player.UserId and hoverOver ~= Target.Value and ClientStates.HealingTeamate then
-				createInstances.SetHighlight(hoverOver, Color3.new(0, 1, 0), false, false)
-			end
-		elseif
-			hoverOver
-			and hoverOver.Name == "Door Closed"
-			and hoverOver.Parent:GetAttribute("Owner") ~= player.UserId
-		then
-			createInstances.SetHighlight(hoverOver, false, Color3.new(0, 0, 0), true)
-			Hologram.Value = MiscFunctions.removeObject(Hologram.Value)
-		else
-			Highlight.Value = MiscFunctions.removeObject(Highlight.Value)
-		end
-	elseif
-		mouse.Target
-		and mouse.Target.Parent
-		and mouse.Target.Parent.Parent.Name == "Spawn"
-		and mouse.Target.Parent.Parent.Parent:GetAttribute("Owner") == player.UserId
-		and not mouse.Target.Parent.Parent:FindFirstChildOfClass("Highlight")
+	local soldierSpawn = mouse.Target and mouse.Target:FindFirstAncestor("Spawn")
+	-- if
+	-- 	input.UserInputType == Enum.UserInputType.MouseMovement
+	-- 	and ClientStates.squad
+	-- 	and not ClientStates.PlacingWall
+	-- then
+	-- 	if not mouse.Target or not mouse.Target.Parent then
+	-- 		return
+	-- 	end
+	-- 	local hoverOver = mouse.Target.Parent
+	-- 	if
+	-- 		hoverOver
+	-- 		and hoverOver.Name == "Door Closed"
+	-- 		and hoverOver.Parent:GetAttribute("Owner") ~= player.UserId
+	-- 	then
+	-- 		createInstances.SetHighlight(hoverOver, false, Color3.new(0, 0, 0), true)
+	-- 	else
+	-- 		Highlight.Value = MiscFunctions.removeObject(Highlight.Value)
+	-- 	end
+	-- end
+	if
+		soldierSpawn
+		and soldierSpawn.Parent:GetAttribute("Owner") == player.UserId
+		and not soldierSpawn:FindFirstChildOfClass("Highlight")
 	then
-		createInstances.SetHighlight(mouse.Target.Parent.Parent, false, Color3.new(0, 0, 0), true)
-	elseif
-		mouse.Target
-			and mouse.Target.Parent.Parent.Name ~= "Spawn"
-			and Highlight.Value
-			and Highlight.Value.Parent.Name ~= "Spawn"
-		or Highlight.Value
-			and Highlight.Value.OutlineColor == Color3.fromRGB(0, 0, 0)
-			and mouse.Target
-			and mouse.Target.Parent.Parent.Name ~= "Spawn"
-	then
+		createInstances.SetHighlight(soldierSpawn, false, Color3.new(0, 0, 0), true)
+	elseif not soldierSpawn and Highlight.Value and Highlight.Value.OutlineColor == Color3.fromRGB(0, 0, 0) then
 		Highlight.Value = MiscFunctions.removeObject(Highlight.Value)
 	end
 end
@@ -180,7 +164,7 @@ CreateEffects.makeHologram = function(start)
 			start + Vector3.new(ClientStates.stepX, 2, ClientStates.stepY),
 			start + Vector3.new(0, 4, 0)
 		)
-		if raycastHit and raycastHit ~= true and Target.Value then
+		if raycastHit and raycastHit ~= true and { Target.Value } then
 			if not Hologram.Value then
 				Hologram.Value = ReplicatedStorage.ReplicatedObjects.hologram:Clone()
 				Hologram.Value.Parent = Workspace.ClientParts
@@ -203,7 +187,7 @@ CreateEffects.makeHologram = function(start)
 	return false
 end
 
-function CreateEffects.CreateSlectionBox()
+function CreateEffects.CreateselectionBox()
 	local frame = Instance.new("Frame")
 	frame.BackgroundTransparency = 0.9
 	frame.BorderSizePixel = 1

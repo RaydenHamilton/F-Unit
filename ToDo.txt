@@ -3,18 +3,18 @@ Note:
 
 TODO:
     bugs:
-
-    -add granades
-    -make path finding better: ie move out of the way of others and not run in to each other
-    -update scripts for sandbags - places ment is good but the destorying of them is bad
-    -make explosions move sand bags
-    
-    
+        client:
+            when highlight box is over troops troops underlay go gray
+        server:
+            -add granades
+            -make path finding better: ie move out of the way of others and not run in to each other
+            -update scripts for sandbags - places ment is good but the destorying of them is bad
+            -make explosions move sand bags
 
 
     squad buttons:
         recruits: 60 mp
-        assault infantry: 110 mp 
+        assault infantry: 110 mp
         regular infantry: 130 mp
         paratroopers: 200 mp
         snlf: 300 mp
@@ -23,7 +23,7 @@ TODO:
         mine disosal: 50 mp
 
     single solder buttons:
-    
+
 Types:
     Rifle Man: 12 mp
     SMG: 12 mp

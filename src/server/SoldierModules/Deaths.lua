@@ -136,9 +136,9 @@ function DeathAnimations:PlayDeath()
 	end
 	self.Soldier.Character:WaitForChild("Underlay"):Destroy()
 
+	self.Soldier.Character.Parent = Workspace.Dead
 	task.wait(3)
 
-	self.Soldier.Character.Parent = Workspace.Dead
 	for _, bodyPart: BasePart | any in pairs(character:GetDescendants()) do
 		if bodyPart:IsA("BasePart") then
 			local BasePart: BasePart = bodyPart

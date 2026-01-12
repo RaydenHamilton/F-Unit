@@ -13,7 +13,6 @@ local actions = botGui.Actions
 local position = botGui.Position
 local mouse = player:GetMouse()
 local Highlight = ReplicatedStorage.States.Highlight
-local Target = ReplicatedStorage.States.Target
 local checkSpawnSize = Vector3.new(20, 20, 20)
 local colorWhite = Color3.new(1, 1, 1)
 local colorBlack = Color3.new(0, 0, 0)
@@ -37,52 +36,47 @@ local stand = position.Stand.ImageButton
 local camera = Workspace.CurrentCamera
 
 --// Local Functions
-
 local function getMouseRaycastTarget()
 	local mousePos = UserInputService:GetMouseLocation()
-
 	local ray = camera:ViewportPointToRay(mousePos.X, mousePos.Y)
-
 	local params = RaycastParams.new()
-	params.FilterType = Enum.RaycastFilterType.Exclude
-	params.FilterDescendantsInstances = { Workspace.ClientParts }
+	params.FilterType = Enum.RaycastFilterType.Include
+	params.FilterDescendantsInstances = { Workspace.Targets[player.UserId], Workspace.Map }
 	params.IgnoreWater = true
-
 	local result = Workspace:Raycast(ray.Origin, ray.Direction * 1000, params)
-
 	return result
 end
 
-local function changeSoldier()
-	miscFunctions.unselect()
-	local raycastResult = getMouseRaycastTarget()
-	local target = raycastResult and raycastResult.Instance
-	player.PlayerGui.ShopUI.Enabled = false
-	local owner = target and target.Parent:GetAttribute("Owner")
-	if target and owner == player.UserId then
-		Target.Value = target.Parent
+local function ShowRange(target)
+	local frameCounter = 0
+	ClientStates.selected = RunService.RenderStepped:Connect(function()
+		frameCounter += 1
+		if frameCounter % 3 == 0 then
+			createEffects.ShowRange(target, target:GetAttribute("Range"), 3)
+		end
+	end)
+end
 
-		local Walls = Target.Value:GetAttribute("Walls")
-		local Meds = Target.Value:GetAttribute("Meds")
+--continue tomorrow
+local function changeSoldier()
+	for _, soldier in ClientStates.squad do
+		player.PlayerGui.ShopUI.Enabled = false
+
+		local Walls = soldier:GetAttribute("Walls")
+		local Meds = soldier:GetAttribute("Meds")
+
 		player.PlayerGui.Main.Heals.Number.Text = Meds
 		player.PlayerGui.Main.Walls.Number.Text = Walls
 
-		Target.Value.Underlay.Color = Color3.new(1, 1, 1)
+		soldier.Underlay.Color = Color3.new(1, 1, 1)
 		botGui.Enabled = true
 		local ShotRules = RaycastParams.new()
 		ShotRules.FilterDescendantsInstances = {
-			Target.Value,
+			ClientStates.squad,
 		}
 		ShotRules.FilterType = Enum.RaycastFilterType.Exclude
 		ShotRules.IgnoreWater = true
-
-		local frameCounter = 0
-		ClientStates.selceted = RunService.RenderStepped:Connect(function()
-			frameCounter += 1
-			if frameCounter % 3 == 0 then
-				createEffects.ShowRange(Target.Value, Target.Value:GetAttribute("Range"), 3)
-			end
-		end)
+		-- ShowRange(target)
 	end
 end
 
@@ -127,13 +121,40 @@ end
 local function isVector2InFrame(point, frame: Frame)
 	local min = Vector2.new(frame.Position.X.Offset, frame.Position.Y.Offset)
 	local max = min - Vector2.new(frame.Size.X.Offset, frame.Size.Y.Offset)
-
 	return (point.X >= min.X and point.X <= max.X and point.Y >= min.Y and point.Y <= max.Y)
+end
+
+local function selectInBox()
+	local selectedTable = {}
+	miscFunctions.unselect()
+	for num, soldier in Workspace.Targets[player.UserId]:GetChildren() do
+		local vector3, onscreen = camera:WorldToViewportPoint(soldier:GetPivot().Position)
+		if onscreen and isVector2InFrame(vector3, selectionBox) then
+			table.insert(selectedTable, soldier)
+			if num == 10 then
+				break
+			end
+		end
+	end
+	return selectedTable
+end
+
+local function getSquadData(): { Wall: number, Meds: number }
+	local squadData = {
+		Wall = 0,
+		Meds = 0,
+	}
+	for _, soldier in ClientStates.squad do
+		squadData.Wall += soldier:GetAttribute("Walls")
+		squadData.Meds += soldier:GetAttribute("Meds")
+	end
+	return squadData
 end
 
 local function onLeftClick()
 	selectionConnection:Disconnect()
-	if selectionBox.size == UDim2.fromOffset(0, 0) then
+	print(selectionBox.size.X.Offset, selectionBox.size.Y.Offset)
+	if selectionBox.size.X.Offset > -10 and selectionBox.size.Y.Offset > -10 then
 		if SpawnHighlighted() then
 			--// check if there are players near spawn
 			if NoSoldiersNearSpawn() then
@@ -143,28 +164,19 @@ local function onLeftClick()
 				FlashOutLine()
 				return
 			end
-		elseif ClientStates.placeingWall then
+		elseif ClientStates.PlacingWall then
 			eventModule.placeWall()
 			return
-		elseif ClientStates.HealingTeamate then
+		elseif ClientStates.HealingTeammate then
 			eventModule.hoverHealableWho()
 			return
-		else --// if not building or healing
-			eventModule.clickNewEnemy()
-			changeSoldier()
 		end
+		miscFunctions.unselect()
 	else
-		local slectedTable = {}
-		for _, soldier in Workspace.Targets[player.UserId]:GetChildren() do
-			local vector3, onscreen = camera:WorldToViewportPoint(soldier:GetPivot().Position)
-			local vector2 = Vector2.new(vector3.X, vector3.Y)
-			if onscreen and isVector2InFrame(vector2, selectionBox) then
-				table.insert(slectedTable, soldier)
-				print(slectedTable)
-			end
-		end
+		ClientStates.squad = selectInBox()
+		changeSoldier()
+		ClientStates.squadData = getSquadData()
 	end
-
 	selectionBox:Destroy()
 end
 
@@ -189,8 +201,8 @@ local function onRightClick()
 	end
 end
 
-local function slecetionBox()
-	local frame, mouseX, mouseY = createEffects.CreateSlectionBox()
+local function selectionBoxEvent()
+	local frame, mouseX, mouseY = createEffects.CreateselectionBox()
 	selectionBox = frame
 	selectionConnection = RunService.Heartbeat:Connect(function()
 		frame.Size = UDim2.fromOffset(mouseX - mouse.X, mouseY - mouse.Y)
@@ -200,7 +212,7 @@ end
 --// Events
 UserInputService.InputChanged:Connect(inputChanged)
 
-mouse.Button1Down:Connect(slecetionBox)
+mouse.Button1Down:Connect(selectionBoxEvent)
 mouse.Button1Up:Connect(onLeftClick)
 mouse.Button2Up:Connect(onRightClick)
 
