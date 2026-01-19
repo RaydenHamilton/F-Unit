@@ -47,15 +47,15 @@ local function getMouseRaycastTarget()
 	return result
 end
 
-local function ShowRange(target)
-	local frameCounter = 0
-	ClientStates.selected = RunService.RenderStepped:Connect(function()
-		frameCounter += 1
-		if frameCounter % 3 == 0 then
-			createEffects.ShowRange(target, target:GetAttribute("Range"), 3)
-		end
-	end)
-end
+-- local function ShowRange(target)
+-- 	local frameCounter = 0
+-- 	ClientStates.selected = RunService.RenderStepped:Connect(function()
+-- 		frameCounter += 1
+-- 		if frameCounter % 3 == 0 then
+-- 			createEffects.ShowRange(target, target:GetAttribute("Range"), 3)
+-- 		end
+-- 	end)
+-- end
 
 --continue tomorrow
 local function changeSoldier()
@@ -153,7 +153,6 @@ end
 
 local function onLeftClick()
 	selectionConnection:Disconnect()
-	print(selectionBox.size.X.Offset, selectionBox.size.Y.Offset)
 	if selectionBox.size.X.Offset > -10 and selectionBox.size.Y.Offset > -10 then
 		if SpawnHighlighted() then
 			--// check if there are players near spawn
@@ -187,7 +186,7 @@ local function inputChanged(input, onGui)
 	if miscFunctions.SoldierNotDoingAnything() and input.UserInputType == Enum.UserInputType.MouseMovement then
 		logicModule.SetHologram()
 	end
-	createEffects.highlightCharacter(input)
+	createEffects.highlightObject(input)
 	createEffects.animateUnderlay(input)
 end
 

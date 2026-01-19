@@ -11,7 +11,6 @@ local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local mouse = player:GetMouse()
 local Highlight = ReplicatedStorage.States.Highlight
-local Target = ReplicatedStorage.States.Target
 local Hologram = ReplicatedStorage.States.Hologram
 local ClientStorage = {}
 
@@ -77,7 +76,7 @@ CreateEffects.makeHologram = function(start)
 			start + Vector3.new(ClientStates.stepX, 2, ClientStates.stepY),
 			start + Vector3.new(0, 4, 0)
 		)
-		if raycastHit and raycastHit ~= true and { Target.Value } then
+		if raycastHit and raycastHit ~= true and ClientStates.squad then
 			if not Hologram.Value then
 				Hologram.Value = ReplicatedStorage.ReplicatedObjects.hologram:Clone()
 				Hologram.Value.Parent = Workspace.ClientParts
@@ -124,7 +123,8 @@ CreateEffects.animateUnderlay = function(input)
 	end
 end
 
-CreateEffects.highlightCharacter = function(input)
+
+CreateEffects.highlightObject= function(input)
 	local soldierSpawn = mouse.Target and mouse.Target:FindFirstAncestor("Spawn")
 	-- if
 	-- 	input.UserInputType == Enum.UserInputType.MouseMovement
@@ -156,6 +156,7 @@ CreateEffects.highlightCharacter = function(input)
 	end
 end
 
+--// TODO Make Better
 CreateEffects.makeHologram = function(start)
 	MiscFunctions.restStep(25)
 	for _ = 0, ClientStates.maxSteps, 1 do
@@ -164,7 +165,7 @@ CreateEffects.makeHologram = function(start)
 			start + Vector3.new(ClientStates.stepX, 2, ClientStates.stepY),
 			start + Vector3.new(0, 4, 0)
 		)
-		if raycastHit and raycastHit ~= true and { Target.Value } then
+		if raycastHit and raycastHit ~= true and ClientStates.squad then
 			if not Hologram.Value then
 				Hologram.Value = ReplicatedStorage.ReplicatedObjects.hologram:Clone()
 				Hologram.Value.Parent = Workspace.ClientParts
