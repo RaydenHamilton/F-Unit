@@ -7,7 +7,7 @@ local keyTable = {}
 
 playerData.__index = playerData
 
-function playerData.New(player: Player)
+function playerData.new(player: Player)
 	local self = setmetatable({}, playerData)
 	local teamFolder = Instance.new("Folder")
 	teamFolder.Parent = Workspace.Targets

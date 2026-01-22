@@ -105,7 +105,6 @@ function soldierAnimation:SetState(Speed: number)
 
 	local state = 0
 	local humanoid: Humanoid = self.Soldier.Humanoid
-
 	if character:GetAttribute("Pose") == "Stand" then
 		state += 0
 		humanoid.WalkSpeed = 16
@@ -129,6 +128,9 @@ function soldierAnimation:SetState(Speed: number)
 		elseif self.Soldier.ClosesEnemy then
 			state += 2 -- targeting
 		else
+			self.Soldier.Humanoid:MoveTo(
+				self.Soldier.HumanoidRootPart.Position + self.Soldier.Events:SoldierTooClose(4)
+			)
 			state += 1 -- idle
 		end
 	else

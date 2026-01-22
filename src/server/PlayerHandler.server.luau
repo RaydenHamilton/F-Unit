@@ -2,7 +2,6 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
-
 --// Modules
 local PlayerData = require(script.Parent.PlayerData)
 local soldierClasses = require(ReplicatedStorage.Shared.SoldierClasses)
@@ -27,9 +26,9 @@ local function GetSoldierFromCharacter(soldierCharacter)
 end
 
 local function onPlayerAdded(player: Player) -- change to on round start
-	PlayerInstances[player.UserId] = PlayerData.New(player)
+	PlayerInstances[player.UserId] = PlayerData.new(player)
 	ReplicatedStorage.NPCEvents.TellClientMoney:FireClient(player, PlayerInstances[player.UserId].Points)
-	while task.wait(1) and Players:FindFirstChild(player.Name) do
+	while task.wait(1) and PlayerInstances[player.UserId] do
 		PlayerInstances[player.UserId]:AddPoints()
 		ReplicatedStorage.NPCEvents.TellClientMoney:FireClient(player, PlayerInstances[player.UserId].Points)
 	end
@@ -55,7 +54,7 @@ local function buySoldier(player: Player, soldierType, spawn: Model)
 		local removingEvent
 		removingEvent = SoldierData.Character.Destroying:Connect(function()
 			SoldierInstance[SoldierData.Character] = nil
-			removingEvent:Disconncet()
+			removingEvent:Disconnect()
 		end)
 	end
 end
@@ -64,10 +63,6 @@ local function onPlayerRemoved(player)
 	PlayerInstances[player.UserId]:RemoveKey()
 	PlayerInstances[player.UserId] = nil
 end
-
---// Events
-Players.PlayerRemoving:Connect(onPlayerRemoved)
-Players.PlayerAdded:Connect(onPlayerAdded)
 
 SpawnUnit.OnServerInvoke = function(player, tabName: string, className: string, spawn: Model)
 	local classes = classList[tabName]
@@ -85,6 +80,10 @@ SpawnUnit.OnServerInvoke = function(player, tabName: string, className: string, 
 	end
 	return false
 end
+
+--// Events
+Players.PlayerRemoving:Connect(onPlayerRemoved)
+Players.PlayerAdded:Connect(onPlayerAdded)
 
 NPCEvents.Move.OnServerEvent:Connect(function(_, soldiersCharacter, state, position)
 	for _, soldier in soldiersCharacter do

@@ -174,6 +174,23 @@ function Events:SetPose(pose)
 	self.Soldier.Animations:SetState((spos - epos).Magnitude, self.Soldier)
 end
 
+function Events:SoldierTooClose(radius)
+	local force = Vector3.zero
+
+	for _, other in ipairs(game.Workspace.Targets[self.Soldier.Owner]:GetChildren()) do
+		if other ~= self.Soldier.Character then
+			local offset = self.Soldier.HumanoidRootPart.Position - other.HumanoidRootPart.Position
+			local dist = offset.Magnitude
+
+			if dist > 0 and dist < radius then
+				force += offset.Unit * (radius - dist)
+			end
+		end
+	end
+
+	return force
+end
+
 function Events:PathFinding(dest: Vector3, magnitude: number)
 	local character = self.Soldier.Character
 	character:SetAttribute("Building", false)
@@ -186,12 +203,13 @@ function Events:PathFinding(dest: Vector3, magnitude: number)
 		if self.Soldier.Path.Status == Enum.PathStatus.Success then
 			local waypoints = self.Soldier.Path:GetWaypoints()
 			for index, point in ipairs(waypoints) do
-				character.Humanoid:MoveTo(point.Position)
+				local nextPosition = point.Position
+				character.Humanoid:MoveTo(nextPosition)
 				-- Wait until the Soldier reaches the point or stop is triggered
-				while (character.HumanoidRootPart.Position - point.Position).magnitude > 5 do
+				while (character.HumanoidRootPart.Position - nextPosition).magnitude > 5 do
 					if
 						character:GetAttribute("StopWalking")
-						or (index == #waypoints and (character.HumanoidRootPart.Position - point.Position).magnitude <= 1)
+						or (index == #waypoints and (character.HumanoidRootPart.Position - nextPosition).magnitude <= 1)
 						or (magnitude and (character.HumanoidRootPart.Position - dest).magnitude < magnitude)
 					then
 						if not self.Soldier.closesEnemy then
@@ -199,6 +217,7 @@ function Events:PathFinding(dest: Vector3, magnitude: number)
 							character["Handle"].Transparency = 0
 						end
 						character:SetAttribute("StopWalking", false)
+
 						return true
 					end
 					task.wait() -- Give some time for movement

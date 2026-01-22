@@ -21,7 +21,7 @@ ShotRules.IgnoreWater = true
 local UNDERLAY_OFFSET = Vector3.new(0, 0.001, 0)
 local UNDERLAY_ROTATION = CFrame.Angles(math.rad(-90), 0, 0)
 local Ray_length = Vector3.new(0, -1000, 0)
-local UPDATE_EVERY = 3 -- update every 2 frames
+local UPDATE_EVERY = 2 -- update every 2 frames
 
 --// Local Functions
 local function SetSoldierUnderlay()

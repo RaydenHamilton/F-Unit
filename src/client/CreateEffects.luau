@@ -99,32 +99,31 @@ CreateEffects.makeHologram = function(start)
 	return false
 end
 
-CreateEffects.animateUnderlay = function(input)
-	if input.UserInputType == Enum.UserInputType.MouseMovement then
-		local char = mouse.Target and mouse.Target.Parent
-
-		if char and char:FindFirstChild("Underlay") then
-			if char.Underlay.Color == Color3.fromRGB(255, 29, 33) then
-				char.Underlay.Color = Color3.fromRGB(88, 88, 88)
-			end
-			TweenService:Create(char.Underlay, TweenInfo.new(0.1), { Size = Vector3.new(4.5, 0.031, 4.5) }):Play()
-			table.insert(ClientStorage, char.Underlay)
-		end
-
-		for i, underlay in pairs(ClientStorage) do
-			if underlay.Size.X > 4 and mouse.Target and mouse.Target.Parent ~= underlay.Parent then
-				if underlay.Color == Color3.fromRGB(88, 88, 88) then
-					underlay.Color = Color3.fromRGB(255, 29, 33)
+CreateEffects.animateUnderlay = function(squadSelected)
+	local squad = squadSelected --or mouse.Target and { mouse.Target:findFirstAncestorOfClass("Model") }
+	for _, char in squad do
+		task.spawn(function()
+			if char and char:FindFirstChild("Underlay") then
+				if char.Underlay.Color == Color3.fromRGB(255, 29, 33) then
+					char.Underlay.Color = Color3.fromRGB(88, 88, 88)
 				end
-				TweenService:Create(underlay, TweenInfo.new(0.1), { Size = Vector3.new(4, 0.031, 4) }):Play()
-				table.remove(ClientStorage, i)
+				TweenService:Create(char.Underlay, TweenInfo.new(0.1), { Size = Vector3.new(4.5, 0.031, 4.5) }):Play()
+				table.insert(ClientStorage, char.Underlay)
 			end
+		end)
+	end
+	for i, underlay in ClientStorage do
+		if underlay.Size.X > 4 and not table.find(squadSelected, underlay.Parent) then
+			if underlay.Color == Color3.fromRGB(88, 88, 88) then
+				underlay.Color = Color3.fromRGB(255, 29, 33)
+			end
+			TweenService:Create(underlay, TweenInfo.new(0.1), { Size = Vector3.new(4, 0.031, 4) }):Play()
+			table.remove(ClientStorage, i)
 		end
 	end
 end
 
-
-CreateEffects.highlightObject= function(input)
+CreateEffects.highlightObject = function()
 	local soldierSpawn = mouse.Target and mouse.Target:FindFirstAncestor("Spawn")
 	-- if
 	-- 	input.UserInputType == Enum.UserInputType.MouseMovement

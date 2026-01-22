@@ -58,23 +58,26 @@ end
 -- end
 
 --continue tomorrow
-local function changeSoldier()
+local function ChangeSoldier()
 	for _, soldier in ClientStates.squad do
 		player.PlayerGui.ShopUI.Enabled = false
+		botGui.Enabled = true
 
-		local Walls = soldier:GetAttribute("Walls")
-		local Meds = soldier:GetAttribute("Meds")
+		-- local Walls = soldier:GetAttribute("Walls")
+		-- local Meds = soldier:GetAttribute("Meds")
 
-		player.PlayerGui.Main.Heals.Number.Text = Meds
-		player.PlayerGui.Main.Walls.Number.Text = Walls
+		-- player.PlayerGui.Main.Heals.Number.Text = Meds
+		-- player.PlayerGui.Main.Walls.Number.Text = Walls
 
 		soldier.Underlay.Color = Color3.new(1, 1, 1)
-		botGui.Enabled = true
+
 		local ShotRules = RaycastParams.new()
 		ShotRules.FilterDescendantsInstances = {
 			ClientStates.squad,
 		}
+
 		ShotRules.FilterType = Enum.RaycastFilterType.Exclude
+
 		ShotRules.IgnoreWater = true
 		-- ShowRange(target)
 	end
@@ -126,7 +129,6 @@ end
 
 local function selectInBox()
 	local selectedTable = {}
-	miscFunctions.unselect()
 	for num, soldier in Workspace.Targets[player.UserId]:GetChildren() do
 		local vector3, onscreen = camera:WorldToViewportPoint(soldier:GetPivot().Position)
 		if onscreen and isVector2InFrame(vector3, selectionBox) then
@@ -153,8 +155,15 @@ end
 
 local function onLeftClick()
 	selectionConnection:Disconnect()
+	print(selectionBox.size.X.Offset == 0 and selectionBox.size.Y.Offset == 0)
 	if selectionBox.size.X.Offset > -10 and selectionBox.size.Y.Offset > -10 then
-		if SpawnHighlighted() then
+		if mouse.Target and mouse.Target:FindFirstAncestor(player.UserId) then
+			miscFunctions.unselect()
+			ClientStates.squad = { mouse.Target:FindFirstAncestorOfClass("Model") }
+			ChangeSoldier()
+			ClientStates.squadData = getSquadData()
+			return
+		elseif SpawnHighlighted() then
 			--// check if there are players near spawn
 			if NoSoldiersNearSpawn() then
 				OpenShopUI()
@@ -172,8 +181,9 @@ local function onLeftClick()
 		end
 		miscFunctions.unselect()
 	else
+		miscFunctions.unselect()
 		ClientStates.squad = selectInBox()
-		changeSoldier()
+		ChangeSoldier()
 		ClientStates.squadData = getSquadData()
 	end
 	selectionBox:Destroy()
@@ -187,7 +197,9 @@ local function inputChanged(input, onGui)
 		logicModule.SetHologram()
 	end
 	createEffects.highlightObject(input)
-	createEffects.animateUnderlay(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		-- createEffects.animateUnderlay()
+	end
 end
 
 local function onRightClick()
@@ -201,10 +213,14 @@ local function onRightClick()
 end
 
 local function selectionBoxEvent()
+	if selectionConnection then
+		selectionConnection:Disconnect()
+	end
 	local frame, mouseX, mouseY = createEffects.CreateselectionBox()
 	selectionBox = frame
 	selectionConnection = RunService.Heartbeat:Connect(function()
 		frame.Size = UDim2.fromOffset(mouseX - mouse.X, mouseY - mouse.Y)
+		createEffects.animateUnderlay(selectInBox())
 	end)
 end
 
